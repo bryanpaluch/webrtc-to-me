@@ -1,6 +1,6 @@
-Conference me maybe
+Webrtc to me
+============
 
-Awesome conference web gui for family connect that plugs into a freeswitch message queue for doing conference manipulation.
+Holds demo webrtc application.
 
-
-Status:  Not Complete
+Status:  Not Yet Complete
