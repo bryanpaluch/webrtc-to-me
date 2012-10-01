@@ -6,6 +6,7 @@
 var express = require('express')
   , mongoStore = require('connect-mongodb')
 	, requirejs = require('requirejs')
+	, jade_browser = require('jade-browser')
 
 exports.boot = function(app, config, passport){
   bootApplication(app, config, passport)
@@ -24,9 +25,10 @@ function bootApplication(app, config, passport) {
 	// 		compileDebug: true
 	// 	})
 	// })
+
   app.set('showStackError', true)
   app.use(express.static(__dirname + '/public'))
-
+  app.use(jade_browser('/js/templates.js', '**', {root: __dirname + '/app/views'}))
   app.use(express.logger(':method :url :status'))
 
   // set views path, template engine and default layout

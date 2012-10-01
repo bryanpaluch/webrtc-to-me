@@ -3,10 +3,13 @@ Member = mongoose.model('Member'),
 User = mongoose.model('User'),
 parseCookie = require('cookie').parse,
 mongoStore = require('connect-mongodb'),
+redis = require("./redis"),
 User = mongoose.model('User')
 
 
-var conferences = {};
+var users = {};
+
+
 
 module.exports = function(server, config, auth) {
 
@@ -43,53 +46,26 @@ module.exports = function(server, config, auth) {
 			if (!user) throw ('Failed to load User ' + socket.handshake.session) 
 			socket.user = {
 				phoneNumber: user.phoneNumber,
-				id: user._id
+				id: user._id,
+				pic: user.twitter.profile_image_url
 			}
+			var userObj ={"name": user.twitter.name,
+											 "handle": user.twitter.screen_name,
+											 "status" : 'open',
+											 "pic": user.twitter.profile_image_url};
+		  redis.joinChannel('chat', user._id, userObj);	
 			socket.join(user._id);
-			socket.emit('conf_status', {
-				type: 'startup'
-			})
+		//	socket.emit('rtc_status', {
+		//		type: 'startup', users: users
+	//		})
 		})
 
-		socket.on('conf_request', function(data) {
+		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(this.user);
 			console.log(data);
-			if (data.action == 'start' && data.target == 'conference') {
-				getMembersAndSend(this.user, data);
-			}else if(data.action != 'stop' && data.target){
-				actionUser(this.user,data);
-			}else if(data.action == 'stop' && data.target){
-				actionUsers(this.user,data);
-			}
 		});
 	});
-	var actionUser = function actionUser(user,data){
-		console.log("creating " + data.action +" amqp call");
-		if (conferences[user.id] === 'true') {
-			var apiCall = {}
-			apiCall.id = user.id
-			apiCall.user = {}
-			apiCall.user.memberid = data.target;
-			apiCall.action = data.action;
-			publishRequest(apiCall, user.id)
-		}else{
-			console.log('No active conference');
-		}
-	}
-	var actionUsers = function actionUsers(user,data){
-		console.log("creating " + data.action +" amqp call");
-		if (conferences[user.id] === 'true') {
-			var apiCall = {}
-			apiCall.id = user.id
-			apiCall.user = {}
-			apiCall.user.memberid = 'all';
-			apiCall.action = data.action;
-			publishRequest(apiCall, user.id)
-		}else{
-			console.log('No active conference');
-		}
-	}
 	
 }
 

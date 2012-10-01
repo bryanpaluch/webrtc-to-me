@@ -3,12 +3,21 @@ extends ../layouts/default
 block main
   .row
     .span4.container
-      #box.well
-        "Thing"
+      #buddylist.well
+        p='Active Users'
+        table.table.table-striped.table-bordered
+          thead
+            tr
+              th 
+              th Person
+              th Action
+          tbody#buddylistrows
+            include list
     .span8.container
-      #box.well
+      #chatarea.well
         "Chat area"
 block extrajs
   script(src='/socket.io/socket.io.js');
+  script(src='/js/templates.js');
   script(src='/js/require.js', data-main='/js/conference.js')
 

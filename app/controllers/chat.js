@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
 	, _ = require('underscore')
+  , redis = require("../../config/redis")
 	, Member = mongoose.model('Member');
 
 
@@ -23,8 +24,16 @@ exports.show = function (req, res) {
   //       })
   //     })
   //   }); 
+	redis.listChannel('chat', function(users){
+	
+	var users = { '2348239823423' : {name: 'Bryan P',
+                       handle: 'letthisbemywrit',
+                       status: 'open',
+                       pic: 'http://a0.twimg.com/profile_images/320465858/twitter_normal.jpg'}};
 
   res.render('chat/show', {
-      user: user
+      user: user,
+      users: users
   })
+	});
 }
