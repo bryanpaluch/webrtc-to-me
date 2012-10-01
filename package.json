@@ -1,0 +1,41 @@
+{
+  "name": "conference-me-maybe",
+  "description": "Freeswitch conference api demo app",
+  "version": "3.0.0",
+  "private": false,
+  "author": "Bryan Paluch https://github.com/bryanpaluch",
+  "engines": {
+    "node": "0.6.18",
+    "npm": "1.1.9"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon server.js"
+  },
+  "dependencies": {
+    "express": "latest",
+    "express-namespace": "latest",
+    "jade": "latest",
+    "mongoose": "latest",
+    "connect-mongodb": "latest",
+    "passport": "latest",
+    "passport-local": "latest",
+    "passport-facebook": "latest",
+    "passport-twitter": "latest",
+    "passport-github": "latest",
+    "passport-google-oauth": "latest",
+    "underscore": "latest",
+    "gzippo": "latest",
+    "async": "latest",
+    "nodemon": "latest"
+  },
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://bryanpaluch@github.com/Comcast/conference-me-maybe.git"
+  },
+  "license": "BSD"
+}

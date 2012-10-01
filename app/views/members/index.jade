@@ -1,0 +1,13 @@
+extends ../layouts/default
+
+block main
+  h1 Family Members
+
+block content
+  each member in members
+    .member
+      a.title(href='/members/'+member._id, title=member.name) #{member.name}
+      p=member.phoneNumber
+      .author
+        span= formatDate(member.createdAt, "%b %d, %Y at %I:%M %p")
+        | &nbsp;|&nbsp;

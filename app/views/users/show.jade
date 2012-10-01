@@ -1,0 +1,20 @@
+extends ../layouts/default
+
+block main
+  h1=user.name
+  - var action = '/users/'+user.id
+  form.form-horizontal(method="post", action=action)
+    input(type="hidden", name="_method", value="PUT") 
+    .control-group
+      label.control-label(for='phoneNumber') Phone Number
+      .controls
+        input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
+      label.control-label(for='familyName') Family Name 
+      .controls
+        input#title.input-xlarge(type='text', name="familyName", value=user.familyName, placeholder=user.familyName)
+
+    .form-actions
+      button.btn.btn-primary(type='submit') Save changes
+      &nbsp;
+      a.btn(href='/members', title="cancel") Cancel
+

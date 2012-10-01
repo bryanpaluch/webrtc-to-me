@@ -1,0 +1,23 @@
+extends ../layouts/default
+
+block main
+  h1= member.name
+
+block content
+  if member.validated 
+    p=member.phoneNumber + "      "
+      span.badge.badge-success="Verified" 
+  else
+    p=member.phoneNumber + "      "
+      span.badge.badge-important="Unverified"
+  .date= formatDate(member.createdAt, "%b %d, %Y at %I:%M %p")
+  p
+    br
+    form.center.form-inline.confirm(action="/members/"+member.id, method="post")
+      a.btn(href='/members/'+member._id+'/edit', title="edit") Edit
+      &nbsp;&nbsp;
+      input(type="hidden", name="_method", value="DELETE")
+      button.btn.btn-danger(type="submit") delete
+
+  p
+    br

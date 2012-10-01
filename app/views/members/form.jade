@@ -1,0 +1,32 @@
+extends ../layouts/default
+
+block content
+  - var action = '/members'
+  if (!member.isNew)
+    - action += '/'+member.id
+
+  if (typeof errors !== 'undefined')
+    .fade.in.alert.alert-block.alert-error
+      a.close(data-dismiss="alert", href="javascript:void(0)") x
+      ul
+        each error in errors
+          li= error.type
+
+  form.form-horizontal(method="post", action=action)
+    if (!member.isNew)
+      input(type="hidden", name="_method", value="PUT")
+
+    .control-group
+      label.control-label(for='name') Name 
+      .controls
+        input#title.input-xlarge(type='text', name="name", value=member.name, placeholder='Enter the Name')
+
+    .control-group
+      label.control-label(for='phoneNumber') Phone Number 
+      .controls
+        input#title.input-xlarge(type='text', name="phoneNumber", value=member.phoneNumber, placeholder='Telephone Number')
+
+    .form-actions
+      button.btn.btn-primary(type='submit') Save changes
+      &nbsp;
+      a.btn(href='/members', title="cancel") Cancel

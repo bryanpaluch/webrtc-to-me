@@ -1,0 +1,14 @@
+extends ../layouts/default
+
+block main
+  .row
+    .span4.container
+      #box.well
+        "Thing"
+    .span8.container
+      #box.well
+        "Chat area"
+block extrajs
+  script(src='/socket.io/socket.io.js');
+  script(src='/js/require.js', data-main='/js/conference.js')
+
