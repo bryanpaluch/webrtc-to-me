@@ -1,0 +1,8 @@
+each user in users
+  tr 
+    td 
+      img(src=user.pic)
+    td
+      p #{user.name} @#{user.handle}
+    td
+      button.btn-primary="Start Chat"
