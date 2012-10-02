@@ -27,10 +27,10 @@ exports.show = function (req, res) {
 	redis.listChannel('chat', function(users){
   console.log(users);
 
-	
+	console.log(user._id);	
   console.log('some connected users')
   res.render('chat/show', {
-      user: user,
+      you: user,
       users: users
   })
   

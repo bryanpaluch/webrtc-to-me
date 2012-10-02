@@ -47,18 +47,20 @@ module.exports = function(server, config, auth) {
 				id: user._id,
 				pic: user.twitter.profile_image_url
 			}
-			var userObj ={"name": user.twitter.name,
+			var userObj ={   "name": user.twitter.name,
 											 "handle": user.twitter.screen_name,
 											 "status" : 'open',
-											 "pic": user.twitter.profile_image_url};
+											 "pic": user.twitter.profile_image_url,
+											 "id" : user._id 
+                   };
 		  redis.joinChannel('chat', user._id, userObj);	
 			socket.join(user._id);
-		//	socket.emit('rtc_status', {
-		//		type: 'startup', users: users
-	//		})
-		})
+			socket.join('chat');
+		  io.sockets.in('chat').emit('rtc_status', {channelJoin: userObj});	
+		});
 		socket.on('disconnect', function(){
 			console.log(socket.user.id + "left the chat");
+			io.sockets.in('chat').emit('rtc_status', {channelExit: socket.user.id});	
 			redis.exitChannel('chat', socket.user.id);
 		});
 
@@ -66,6 +68,9 @@ module.exports = function(server, config, auth) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(this.user);
 			console.log(data);
+			var target = data.target;
+			data.target = this.user.id;
+			io.sockets.in(target).emit('rtc_request', data);
 		});
 	});
 	
