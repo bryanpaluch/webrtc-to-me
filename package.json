@@ -1,7 +1,7 @@
 {
-  "name": "conference-me-maybe",
+  "name": "webrtc-with-me",
   "description": "Freeswitch conference api demo app",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "private": false,
   "author": "Bryan Paluch https://github.com/bryanpaluch",
   "engines": {
@@ -37,5 +37,11 @@
     "type": "git",
     "url": "https://bryanpaluch@github.com/Comcast/conference-me-maybe.git"
   },
-  "license": "BSD"
+  "license": "BSD",
+  "keywords": [
+    "webrtc",
+    "rtc",
+    "twitter",
+    ""
+  ]
 }
