@@ -38,8 +38,8 @@ function bootApplication(app, config, passport) {
   app.configure(function () {
     // dynamic helpers
     app.use(function (req, res, next) {
-      res.locals.appName = 'Webrtc Me'
-      res.locals.title = 'Webrtc Me'
+      res.locals.appName = 'RTC With Me'
+      res.locals.title = 'RTC With Me'
       res.locals.showStack = app.showStackError
       res.locals.req = req
       res.locals.formatDate = function (date) {
