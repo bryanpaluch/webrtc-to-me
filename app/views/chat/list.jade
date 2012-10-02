@@ -5,4 +5,4 @@ each user in users
     td
       p #{user.name} @#{user.handle}
     td
-      button.btn-primary="Start Chat"
+      button.btn-primary(target=user.id)="Start Chat"

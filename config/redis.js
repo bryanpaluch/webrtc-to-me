@@ -23,7 +23,7 @@ exports.joinChannel = function (channel,id, userObj){
 }  
 exports.exitChannel = function (channel, id){
 	rclient.srem(channel, id);
-	rclient.hdel(channel,id);
+	//rclient.hdel(id);
 }
 
 exports.listChannel = function (channel, callback){
@@ -50,7 +50,7 @@ var channelListing = {}
 				});
 			});
 		}else{
-			callback(null);
+			callback(channelListing);
 		}
 		});
 }

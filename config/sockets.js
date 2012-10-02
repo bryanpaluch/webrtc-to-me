@@ -13,8 +13,6 @@ var users = {};
 
 module.exports = function(server, config, auth) {
 
-
-
 	io = require('socket.io').listen(server)
 	var sessionStore = new mongoStore({
 		url: config.db,
@@ -59,6 +57,10 @@ module.exports = function(server, config, auth) {
 		//		type: 'startup', users: users
 	//		})
 		})
+		socket.on('disconnect', function(){
+			console.log(socket.user.id + "left the chat");
+			redis.exitChannel('chat', socket.user.id);
+		});
 
 		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);

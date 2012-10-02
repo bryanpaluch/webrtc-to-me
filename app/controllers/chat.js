@@ -25,15 +25,14 @@ exports.show = function (req, res) {
   //     })
   //   }); 
 	redis.listChannel('chat', function(users){
-	
-	var users = { '2348239823423' : {name: 'Bryan P',
-                       handle: 'letthisbemywrit',
-                       status: 'open',
-                       pic: 'http://a0.twimg.com/profile_images/320465858/twitter_normal.jpg'}};
+  console.log(users);
 
+	
+  console.log('some connected users')
   res.render('chat/show', {
       user: user,
       users: users
   })
+  
 	});
 }
