@@ -1,19 +1,12 @@
 extends ../layouts/default
 
 block main
-  h1= title
 
 block content
+  .row.span8
+    p="Please login using twitter"
   .row
-    .offset1.span5
+    .span8
       a(href="/auth/twitter")
         img(src="/img/twitter.png")
-    .span6
-      if (typeof errors !== 'undefined')
-        .fade.in.alert.alert-block.alert-error
-          a.close(data-dismiss="alert", href="javascript:void(0)") x
-          ul
-            each error in errors
-              li= error.type
 
-      block auth

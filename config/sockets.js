@@ -18,6 +18,7 @@ module.exports = function(server, config, auth) {
 		url: config.db,
 		collection: 'sessions'
 	})
+	io.set('log level', 0);
 
 	io.set('authorization', function(data, accept) {
 		if (data.headers.cookie) {

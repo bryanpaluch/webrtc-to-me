@@ -55,6 +55,6 @@ module.exports = function (app, passport, auth) {
   })
 
   // home route
-  app.get('/', auth.requiresLogin, members.index)
+  app.get('/', auth.requiresLogin, chat.show)
 
 }

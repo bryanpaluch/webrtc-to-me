@@ -20,7 +20,7 @@ $(document).ready(function() {
 	socket = io.connect('/');
 	socket.on('connect', function() {
 
-		$("#start").removeAttr('disabled');
+    $(":button").removeAttr('disabled');
 	});
 
 	socket.on('disconnect', function() {
@@ -30,6 +30,7 @@ $(document).ready(function() {
 	socket.on('rtc_status', function(data) {
 		console.log(data);
 		if (data.channelJoin) {
+			console.log('Someone joined channel');
 			channelJoin(data.channelJoin);
 		} else if (data.channelExit) {
 			channelExit(data.channelExit);
@@ -37,6 +38,7 @@ $(document).ready(function() {
 	});
 	socket.on('rtc_request', function(req) {
 		currentTarget = req.target;
+    $(":button").attr('disabled', 'disabled');
 		processSignalingMessage(req);
 	});
 
@@ -46,6 +48,7 @@ $(document).ready(function() {
 		var target = $(this).attr('target');
 		if (action == 'startChat') {
 			currentTarget = target;
+      $(":button").attr('disabled', 'disabled');
       initiator = true;
 			maybeStart();	
 		}
@@ -65,7 +68,9 @@ function doRequest(req) {
 	}
 }
 function channelJoin(user) {
-	if (usersList[user.id]) {} else {
+	if (usersList[user.id]) {
+	console.log('user already in channel');	
+	} else {
 		usersList[user.id] = user;
 		renderList();
 	}
@@ -189,6 +194,7 @@ function onUserMediaSuccess(stream) {
 	localVideo.style.opacity = 1;
 	localVideo.src = url;
 	localStream = stream;
+  $('#localTwitter').removeAttr('hidden');
 }
 function onUserMediaError(error) {
 	console.log("Failed to get access to local media. Error code was " + error.code);
