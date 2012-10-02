@@ -33,6 +33,6 @@ require('./settings').boot(app, config, passport)         // Bootstrap applicati
 require('./config/routes')(app, passport, auth)
 require('./config/sockets')(server, config, auth)
 // Start the app by listening on <port>
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 80
 server.listen(port)
 console.log('Express app started on port '+port)

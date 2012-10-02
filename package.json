@@ -26,7 +26,12 @@
     "underscore": "latest",
     "gzippo": "latest",
     "async": "latest",
-    "nodemon": "latest"
+    "nodemon": "latest",
+    "requirejs": "latest",
+    "jade-browser": "latest",
+    "redis" : "latest",
+    "cookie" : "latest",
+    "socket.io" : "latest"
   },
   "main": "server.js",
   "directories": {
