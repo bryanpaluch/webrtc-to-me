@@ -43,6 +43,7 @@ module.exports = function(server, config, auth) {
 	});
 
 	io.sockets.on('connection', function(socket) {
+		socket.legs = {};
 		//Start Pulling User data to attach to socket. 
 		User.findOne({
 			_id: socket.handshake.user
@@ -71,6 +72,9 @@ module.exports = function(server, config, auth) {
 			console.log(socket.user.id + "left the chat");
 			io.sockets.in(socket.chatChannel).emit('rtc_status', {channelExit: socket.user.id});	
 			redis.exitChannel(socket.chatChannel, socket.user.id);
+		  for ( var leg in socket.legs){
+				io.sockets.in(leg).emit('rtc_request', {type : 'bye', target : socket.user.id});
+			}	
 		});
 		socket.on('rtc_join', function(data){
 			console.log('Got channel join request');
@@ -95,10 +99,12 @@ module.exports = function(server, config, auth) {
 		})
 		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);
-			console.log(this.user);
 			console.log(data);
 			var target = data.target;
 			data.target = this.user.id;
+			if(data.type == 'offer' || data.type == 'answer'){
+			socket.legs[target] = true;
+			}	
 			io.sockets.in(target).emit('rtc_request', data);
 		});
 	});
