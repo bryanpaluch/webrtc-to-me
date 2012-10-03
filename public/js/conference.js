@@ -18,7 +18,8 @@ $(document).ready(function() {
 	usersList = JSON.parse($("#users_list").html());
 	you = JSON.parse($("#you").html());	
 	if ($("#hash")){
-		hash = JSON.parse($("#hash").html());
+		console.log('Hash Detected' + $("#hash").html());
+		hash = $("#hash").html();
 	}
   $(":button").attr('disabled', 'disabled');
 

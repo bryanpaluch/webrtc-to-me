@@ -8,7 +8,7 @@ module.exports = function (app, passport, auth) {
 	// conference routes
   var chat = require('../app/controllers/chat')
 	app.get('/chat', auth.requiresLogin, chat.show);	
-
+  app.get('/c/:hash', auth.requiresLogin, chat.showHash);
   // user routes
   var users = require('../app/controllers/users')
   app.get('/login', users.login)

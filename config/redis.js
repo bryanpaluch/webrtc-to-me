@@ -13,8 +13,10 @@ console.log("flush complete");
 exports.joinChannel = function (channel,id, userObj){
 	console.log("channel add for " + channel + " For id " + id);	
 	rclient.sadd(channel, id);
-	console.log( userObj);
+	console.log(userObj);
+	
 	for (var k in userObj){
+			console.log(userObj[k], k);
 			rclient.HMSET(id, k, userObj[k]);
   }	
 	//this is buggy waiting for update

@@ -50,11 +50,11 @@ module.exports = function(server, config, auth) {
 			if (err) throw (err) 
 			if (!user) throw ('Failed to load User ' + socket.handshake.session) 
 			socket.user = {
-				phoneNumber: user.phoneNumber,
 				"name": user.twitter.name,
 				"handle": user.twitter.screen_name,
-				id: user._id,
-				pic: user.twitter.profile_image_url
+				"id": user._id,
+				"pic": user.twitter.profile_image_url,
+				'status' : 'open'
 			}
 			var userObj = {                  "name": user.twitter.name,
 											 "handle": user.twitter.screen_name,
@@ -73,9 +73,11 @@ module.exports = function(server, config, auth) {
 			redis.exitChannel(socket.chatChannel, socket.user.id);
 		});
 		socket.on('rtc_join', function(data){
+			console.log('Got channel join request');
+			console.log(data);
 			if(data.hash){
 			console.log('User requested to join channel hash ' + data.hash);
-			sht.retrieve(data.hash, function(err, shortObj){
+			shrt.retrieve(data.hash, function(err, shortObj){
 				if(err) throw Error(err);
 				socket.chatChannel = shortObj.URL + '-owner';
 				redis.joinChannel(shortObj.URL + '-owner', socket.user.id, socket.user);	
@@ -85,6 +87,7 @@ module.exports = function(server, config, auth) {
 			}else{
 			console.log('User will join their own channel');
 			socket.chatChannel = socket.user.id + '-owner';
+			console.log(socket.user);
 			redis.joinChannel(socket.user.id + '-owner', socket.user.id, socket.user);	
 			socket.join(socket.user.id + '-owner');
 		    io.sockets.in(socket.user.id + '-owner').emit('rtc_status', {channelJoin: socket.user});
