@@ -1,6 +1,12 @@
 var mongoose = require('mongoose')
 	, _ = require('underscore')
   , User = mongoose.model('User')
+  , shrt = require('short')
+
+shrt.connect('mongodb://localhost/webrtc-me');
+shrt.connection.on('error', function(error){
+  throw new Error(error);
+});
 
 exports.signin = function (req, res) {}
 
@@ -48,7 +54,26 @@ exports.create = function (req, res) {
 }
 
 exports.update = function(req, res){
-  var user = req.user
+  var user = req.user;
+  if (req.body.chatUrl == ''){
+    shrt.generate(user.id, function(error, shrtObj) {
+      req.body.chatUrl = shrtObj.hash;
+      user = _.extend(user, req.body)
+      user.save(function(err, doc) {
+        if (err) {
+        res.render('users/show', {
+            title: 'Edit User'
+          , user: user
+          , errors: err.errors
+         })
+        }
+        else {
+          res.redirect('/users/'+user._id)
+        }
+      })
+
+    });
+  }else {
   user = _.extend(user, req.body)
   user.save(function(err, doc) {
     if (err) {
@@ -62,6 +87,7 @@ exports.update = function(req, res){
       res.redirect('/users/'+user._id)
     }
   })
+  }
 }
 
 // show profile

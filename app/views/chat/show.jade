@@ -27,3 +27,6 @@ block extrajs
   script(src='/js/require.js', data-main='/js/conference.js')
   script#users_list(type='text/json')!=JSON.stringify(users)
   script#you(type='text/json')!=JSON.stringify(you)
+  if thisIsHash
+    script#hash(type='text/json')!=hash
+

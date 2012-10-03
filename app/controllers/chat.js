@@ -7,23 +7,7 @@ var mongoose = require('mongoose')
 // show profile
 exports.show = function (req, res) {
   var user = req.user
-  // Member	
-  //   .find({})
-  //   .populate('user', 'name')
-  //   .sort({'createdAt': -1}) // sort by date
-  //   .exec(function(err, members) {
-  //     if (err) return res.render('500')
-  //     Member.count().exec(function (err, count) {
-		// 		members.unshift({name: "You", phoneNumber: user.phoneNumber});
-		// 		console.log(members);
-  //       res.render('conference/show', {
-  //           title: 'List of Conference Users'
-		// 			, user : user
-  //         , users: members
-		// 			, conference_state : 'conferenceState' 
-  //       })
-  //     })
-  //   }); 
+
 	redis.listChannel('chat', function(users){
   console.log(users);
 
@@ -31,8 +15,27 @@ exports.show = function (req, res) {
   console.log('some connected users')
   res.render('chat/show', {
       you: user,
-      users: users
+      users: users,
+      thisIsHash: false
   })
   
 	});
+}
+
+exports.showHash = function (req, res) {
+  var user = req.user
+  
+  redis.listChannel('chat', function(users){
+  console.log(users);
+
+  console.log(user._id);  
+  console.log('some connected users')
+  res.render('chat/show', {
+      you: user,
+      users: users,
+      thisIsHash: true,
+      hash: hash
+  })
+  
+  });
 }

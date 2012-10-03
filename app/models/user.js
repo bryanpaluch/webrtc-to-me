@@ -18,6 +18,8 @@ var UserSchema = new Schema({
   , github: {}
 	, phoneNumber: ''
 	, familyName: ''
+  , phoneInChat: false
+  , chatUrl: ''
 })
 
 // virtual attributes

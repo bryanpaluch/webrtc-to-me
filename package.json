@@ -1,6 +1,6 @@
 {
   "name": "webrtc-with-me",
-  "description": "Freeswitch conference api demo app",
+  "description": "webrtc communication portal",
   "version": "1.0.0",
   "private": false,
   "author": "Bryan Paluch https://github.com/bryanpaluch",
@@ -31,7 +31,8 @@
     "jade-browser": "latest",
     "redis" : "latest",
     "cookie" : "latest",
-    "socket.io" : "latest"
+    "socket.io" : "latest",
+    "short" : "latest"
   },
   "main": "server.js",
   "directories": {

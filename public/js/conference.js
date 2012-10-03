@@ -10,16 +10,21 @@ var initiator;
 var started = false;
 var currenTarget;
 var you;
+var hash = null;
+
 $(document).ready(function() {
 	init();
 	//Load connected users from json script
 	usersList = JSON.parse($("#users_list").html());
 	you = JSON.parse($("#you").html());	
+	if ($("#hash")){
+		hash = JSON.parse($("#hash").html());
+	}
   $(":button").attr('disabled', 'disabled');
 
 	socket = io.connect('/');
 	socket.on('connect', function() {
-
+		
     $(":button").removeAttr('disabled');
 	});
 
@@ -34,6 +39,12 @@ $(document).ready(function() {
 			channelJoin(data.channelJoin);
 		} else if (data.channelExit) {
 			channelExit(data.channelExit);
+		} else if (data.ready){
+			if(hash){
+		socket.emit('rtc_join', {hash : hash});
+		}else{
+		socket.emit('rtc_join', you);
+		}
 		}
 	});
 	socket.on('rtc_request', function(req) {

@@ -4,7 +4,13 @@ User = mongoose.model('User'),
 parseCookie = require('cookie').parse,
 mongoStore = require('connect-mongodb'),
 redis = require("./redis"),
-User = mongoose.model('User')
+User = mongoose.model('User'),
+shrt = require('short')
+
+shrt.connect('mongodb://localhost/webrtc-me');
+shrt.connection.on('error', function(error){
+  throw new Error(error);
+});
 
 
 var users = {};
@@ -45,26 +51,45 @@ module.exports = function(server, config, auth) {
 			if (!user) throw ('Failed to load User ' + socket.handshake.session) 
 			socket.user = {
 				phoneNumber: user.phoneNumber,
+				"name": user.twitter.name,
+				"handle": user.twitter.screen_name,
 				id: user._id,
 				pic: user.twitter.profile_image_url
 			}
-			var userObj ={   "name": user.twitter.name,
+			var userObj = {                  "name": user.twitter.name,
 											 "handle": user.twitter.screen_name,
 											 "status" : 'open',
 											 "pic": user.twitter.profile_image_url,
 											 "id" : user._id 
-                   };
-		  redis.joinChannel('chat', user._id, userObj);	
+                          };
+		  
 			socket.join(user._id);
-			socket.join('chat');
-		  io.sockets.in('chat').emit('rtc_status', {channelJoin: userObj});	
+			socket.emit('rtc_status', {ready: true});
+				
 		});
 		socket.on('disconnect', function(){
 			console.log(socket.user.id + "left the chat");
-			io.sockets.in('chat').emit('rtc_status', {channelExit: socket.user.id});	
-			redis.exitChannel('chat', socket.user.id);
+			io.sockets.in(socket.chatChannel).emit('rtc_status', {channelExit: socket.user.id});	
+			redis.exitChannel(socket.chatChannel, socket.user.id);
 		});
-
+		socket.on('rtc_join', function(data){
+			if(data.hash){
+			console.log('User requested to join channel hash ' + data.hash);
+			sht.retrieve(data.hash, function(err, shortObj){
+				if(err) throw Error(err);
+				socket.chatChannel = shortObj.URL + '-owner';
+				redis.joinChannel(shortObj.URL + '-owner', socket.user.id, socket.user);	
+				socket.join(shortObj.URL + '-owner');
+		    	io.sockets.in(shortObj.URL + '-owner').emit('rtc_status', {channelJoin: socket.user});
+			});
+			}else{
+			console.log('User will join their own channel');
+			socket.chatChannel = socket.user.id + '-owner';
+			redis.joinChannel(socket.user.id + '-owner', socket.user.id, socket.user);	
+			socket.join(socket.user.id + '-owner');
+		    io.sockets.in(socket.user.id + '-owner').emit('rtc_status', {channelJoin: socket.user});
+			}
+		})
 		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(this.user);
