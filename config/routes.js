@@ -3,12 +3,14 @@ var mongoose = require('mongoose')
   , Member = mongoose.model('Member')
   , User = mongoose.model('User')
   , async = require('async')
+  , uaParser = require('ua-parser');
 
 module.exports = function (app, passport, auth) {
 	// conference routes
   var chat = require('../app/controllers/chat')
-	app.get('/chat', auth.requiresLogin, chat.show);	
-  app.get('/c/:hash', auth.requiresLogin, chat.showHash);
+	app.get('/chat',auth.requiresLogin,checkBrowser, chat.show);	
+  app.get('/c/:hash', auth.requiresLogin, checkBrowser, chat.showHash);
+	app.get('/notsupported', chat.notSupported);
   // user routes
   var users = require('../app/controllers/users')
   app.get('/login', users.login)
@@ -53,8 +55,17 @@ module.exports = function (app, passport, auth) {
           next()
       })
   })
-
+	function checkBrowser(req, res, next){
+			var ua = uaParser.parse(req.headers['user-agent']);
+			console.log(ua);
+			if(ua.family == 'Chrome' && ua.patch <= 1284 && ua.major <= 24)
+      {
+			next();
+			}else{
+			return res.redirect('/notsupported');
+			} 
+	}
   // home route
-  app.get('/', auth.requiresLogin, chat.show)
-
+  app.get('/', checkBrowser, auth.requiresLogin, chat.show)
+  app.get('/*', checkBrowser);
 }

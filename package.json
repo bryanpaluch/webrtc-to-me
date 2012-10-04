@@ -32,7 +32,8 @@
     "redis" : "latest",
     "cookie" : "latest",
     "socket.io" : "latest",
-    "short" : "latest"
+    "short" : "latest",
+    "ua-parser" : "latest"
   },
   "main": "server.js",
   "directories": {

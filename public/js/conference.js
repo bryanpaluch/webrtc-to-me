@@ -11,6 +11,20 @@ var started = false;
 var currenTarget;
 var you;
 var hash = null;
+var socketReady = false;
+var userMediaReady = false;
+function selectText() {
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById('shortUrl'));
+            range.select();
+        } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById('shortUrl'));
+            window.getSelection().addRange(range);
+        }
+}
+$("#shortUrl").click(function(){selectText()});
 
 $(document).ready(function() {
 	init();
@@ -41,11 +55,8 @@ $(document).ready(function() {
 		} else if (data.channelExit) {
 			channelExit(data.channelExit);
 		} else if (data.ready){
-			if(hash){
-		socket.emit('rtc_join', {hash : hash});
-		}else{
-		socket.emit('rtc_join', you);
-		}
+			socketReady = true;	
+			webRtcReady();
 		}
 	});
 	socket.on('rtc_request', function(req) {
@@ -71,6 +82,18 @@ $(document).ready(function() {
 	});
 
 });
+function webRtcReady(){
+	if(socketReady && userMediaReady){
+		console.log(socketReady);
+		console.log(userMediaReady);	
+		console.log('webrtc ready');	
+    if(hash){
+		socket.emit('rtc_join', {hash : hash});
+		}else{
+		socket.emit('rtc_join', you);
+		}
+	}
+}
 function doRequest(req) {
 	if (cstate != 'open') {
 		console.log('not in open state ignoring TODO respond');
@@ -207,6 +230,8 @@ function onUserMediaSuccess(stream) {
 	localVideo.src = url;
 	localStream = stream;
   $('#localTwitter').removeAttr('hidden');
+	userMediaReady = true;
+	webRtcReady();
 }
 function onUserMediaError(error) {
 	console.log("Failed to get access to local media. Error code was " + error.code);

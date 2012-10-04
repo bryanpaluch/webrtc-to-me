@@ -49,3 +49,9 @@ exports.showHash = function (req, res) {
   		});
 	});
 }
+
+exports.notSupported = function (req, res){
+	res.render('chat/notSupported',{
+	
+	});
+}

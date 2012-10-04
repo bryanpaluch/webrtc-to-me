@@ -1,25 +1,25 @@
 extends ../layouts/default
 
 block main
-  div.row.span12.offset1.pull-left
+  .user_edit.row.span12
     h1=user.name
     - var action = '/users/'+user.id
-  form.row.form-horizontal(method="post", action=action)
-    input(type="hidden", name="_method", value="PUT") 
-    .control-group
-      label.control-label(for='phoneNumber') Phone Number
-      .controls
-        input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
-    .control-group
-      label.checkbox.control-label(for='phoneInChat') Phone Number Endpoint
-      .controls
-        input(type='checkbox', name="phoneInChat", value=user.phoneInChat, placeholder=user.phoneInChat)
-    .control-group
-      label.control-label(for='chatUrl') Comm Me Link
-      .controls
-        input#title.input-xlarge(type='text', name="chatUrl", value=user.chatUrl, placeholder=user.chatUrl)
+    form.row.form-horizontal(method="post", action=action)
+      input(type="hidden", name="_method", value="PUT") 
+      .control-group
+        label.control-label(for='phoneNumber') Phone Number
+        .controls
+          input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
+      .control-group
+        label.checkbox.control-label(for='phoneInChat') Phone Number Endpoint
+        .controls
+          input(type='checkbox', name="phoneInChat", value=user.phoneInChat, placeholder=user.phoneInChat)
+      .control-group
+        label.control-label(for='chatUrl') Comm Me Link
+        .controls
+          input#title.input-xlarge(type='text', name="chatUrl", value=user.chatUrl, placeholder=user.chatUrl)
 
-    .form-actions
-      button.btn.btn-primary(type='submit') Save changes
-      &nbsp;
-      a.btn(href='/members', title="cancel") Cancel
+      .form-actions
+        button.btn.btn-primary(type='submit') Save changes
+        &nbsp;
+        a.btn(href='/members', title="cancel") Cancel

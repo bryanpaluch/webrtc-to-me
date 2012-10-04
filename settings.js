@@ -25,7 +25,7 @@ function bootApplication(app, config, passport) {
 	// 		compileDebug: true
 	// 	})
 	// })
-
+	global.shortUrl = config.shortUrl;
   app.set('showStackError', true)
   app.use(express.static(__dirname + '/public'))
   app.use(jade_browser('/js/templates.js', '**', {root: __dirname + '/app/views'}))
