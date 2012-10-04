@@ -31,11 +31,15 @@ module.exports = function(server, config, auth) {
 			data.cookie = parseCookie(data.headers.cookie)
 			data.sessionID = data.cookie['connect.sid'].split(':')[1].split('.')[0]
 			sessionStore.get(data.sessionID, function(err, sess) {
+				if(sess){
 				if (err) console.log(err);
 				data.user = sess.passport.user;
 
 				//Start Pulling User data to attach to socket. 
 				return accept(null, true);
+				}else{
+				return accept('No Session Found',false);	
+				}
 			})
 		} else {
 			return accept('No cookie transmitted', false);
