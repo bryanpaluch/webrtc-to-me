@@ -55,7 +55,8 @@ exports.create = function (req, res) {
 
 exports.update = function(req, res){
   var user = req.user;
-  if (req.body.chatUrl == ''){
+	console.log(req.body);
+  if (req.body.regenerate == 'on'){
     shrt.generate(user.id, function(error, shrtObj) {
       req.body.chatUrl = shrtObj.hash;
       user = _.extend(user, req.body)
