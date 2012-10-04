@@ -12,7 +12,11 @@ exports.signin = function (req, res) {}
 
 // auth callback
 exports.authCallback = function (req, res, next) {
-  res.redirect('/')
+ 	if(req.session.initialRequest){
+	res.redirect(req.session.initialRequest);
+	}else{ 
+  res.redirect('/');
+	}
 }
 
 // login
@@ -54,8 +58,8 @@ exports.create = function (req, res) {
 }
 
 exports.update = function(req, res){
-  var user = req.user;
-	console.log(req.body);
+	var user = req.user;
+	var oldShort = req.profile.chatUrl;
   if (req.body.regenerate == 'on'){
     shrt.generate(user.id, function(error, shrtObj) {
       req.body.chatUrl = shrtObj.hash;
@@ -74,6 +78,14 @@ exports.update = function(req, res){
       })
 
     });
+   	if(oldShort){ 
+   	  shrt.retrieve(oldShort, function(error,oldShortObj){
+				if (error) throw Error(error);
+				oldShortObj.remove();
+				oldShortObj.save(function(err){
+				});
+			});
+		}
   }else {
   user = _.extend(user, req.body)
   user.save(function(err, doc) {
@@ -93,7 +105,6 @@ exports.update = function(req, res){
 
 // show profile
 exports.show = function (req, res) {
-  console.log(req.profile.twitter)
   var user = req.profile
   res.render('users/show', {
       title: user.name

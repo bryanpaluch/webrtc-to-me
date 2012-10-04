@@ -4,7 +4,10 @@
  */
 
 exports.requiresLogin = function (req, res, next) {
-  if (!req.isAuthenticated()) {
+	console.log(req.session); 
+	if (!req.isAuthenticated()) {
+ 	  req.session['initialRequest'] = req.url;
+		console.log(req.session); 
     return res.redirect('/login')
   }
   next()

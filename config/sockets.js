@@ -83,10 +83,15 @@ module.exports = function(server, config, auth) {
 			console.log('User requested to join channel hash ' + data.hash);
 			shrt.retrieve(data.hash, function(err, shortObj){
 				if(err) throw Error(err);
-				socket.chatChannel = shortObj.URL + '-owner';
-				redis.joinChannel(shortObj.URL + '-owner', socket.user.id, socket.user);	
-				socket.join(shortObj.URL + '-owner');
-		    	io.sockets.in(shortObj.URL + '-owner').emit('rtc_status', {channelJoin: socket.user});
+        if(shortObj){
+					socket.chatChannel = shortObj.URL + '-owner';
+					redis.joinChannel(shortObj.URL + '-owner', socket.user.id, socket.user);	
+					socket.join(shortObj.URL + '-owner');
+		   		io.sockets.in(shortObj.URL + '-owner').emit('rtc_status', {channelJoin: socket.user});
+				} else {
+				console.log("Someone tried to join a room that didn't exist, reloading their code");	
+				socket.emit('rtc_reload', {"destination" : '/'});
+				}
 			});
 			}else{
 			console.log('User will join their own channel');

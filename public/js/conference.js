@@ -64,6 +64,10 @@ $(document).ready(function() {
     $(":button").attr('disabled', 'disabled');
 		processSignalingMessage(req);
 	});
+	socket.on('rtc_reload', function(data){
+		console.log("New code on site, or bad io socket data, bye bye");
+		window.location = data.destination;
+	});
 
 	$(":button").live('click', function() {
 		console.log(this);
@@ -304,6 +308,7 @@ function transitionToWaiting() {
 }
 
 function transitionToDone() {
+  $('#remoteTwitter').html('');
 	localVideo.style.opacity = 0;
 	remoteVideo.style.opacity = 0;
 }
