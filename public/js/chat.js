@@ -13,34 +13,41 @@ var you;
 var hash = null;
 var socketReady = false;
 var userMediaReady = false;
+var isRTCPeerConnection = true;
+var mediaConstraints = {
+	'has_audio': true,
+	'has_video': true
+};
 function selectText() {
-        if (document.selection) {
-            var range = document.body.createTextRange();
-            range.moveToElementText(document.getElementById('shortUrl'));
-            range.select();
-        } else if (window.getSelection) {
-            var range = document.createRange();
-            range.selectNode(document.getElementById('shortUrl'));
-            window.getSelection().addRange(range);
-        }
+	if (document.selection) {
+		var range = document.body.createTextRange();
+		range.moveToElementText(document.getElementById('shortUrl'));
+		range.select();
+	} else if (window.getSelection) {
+		var range = document.createRange();
+		range.selectNode(document.getElementById('shortUrl'));
+		window.getSelection().addRange(range);
+	}
 }
-$("#shortUrl").click(function(){selectText()});
+$("#shortUrl").click(function() {
+	selectText()
+});
 
 $(document).ready(function() {
 	init();
 	//Load connected users from json script
 	usersList = JSON.parse($("#users_list").html());
-	you = JSON.parse($("#you").html());	
-	if ($("#hash")){
+	you = JSON.parse($("#you").html());
+	if ($("#hash")) {
 		console.log('Hash Detected' + $("#hash").html());
 		hash = $("#hash").html();
 	}
-  $(":button").attr('disabled', 'disabled');
+	$(":button").attr('disabled', 'disabled');
 
 	socket = io.connect('/');
 	socket.on('connect', function() {
-		
-    $(":button").removeAttr('disabled');
+
+		$(":button").removeAttr('disabled');
 	});
 
 	socket.on('disconnect', function() {
@@ -54,17 +61,21 @@ $(document).ready(function() {
 			channelJoin(data.channelJoin);
 		} else if (data.channelExit) {
 			channelExit(data.channelExit);
-		} else if (data.ready){
-			socketReady = true;	
+		} else if (data.ready) {
+			socketReady = true;
 			webRtcReady();
 		}
 	});
 	socket.on('rtc_request', function(req) {
 		currentTarget = req.target;
-    $(":button").attr('disabled', 'disabled');
-		processSignalingMessage(req);
+		$(":button").attr('disabled', 'disabled');
+		if (isRTCPeerConnection)	
+			processSignalingMessage(req);
+		else
+			processSignalingMessage00(req);
+
 	});
-	socket.on('rtc_reload', function(data){
+	socket.on('rtc_reload', function(data) {
 		console.log("New code on site, or bad io socket data, bye bye");
 		window.location = data.destination;
 	});
@@ -75,9 +86,9 @@ $(document).ready(function() {
 		var target = $(this).attr('target');
 		if (action == 'startChat') {
 			currentTarget = target;
-      $(":button").attr('disabled', 'disabled');
-      initiator = true;
-			maybeStart();	
+			$(":button").attr('disabled', 'disabled');
+			initiator = true;
+			maybeStart();
 		}
 		socket.emit('rtc_request', {
 			'action': action,
@@ -86,29 +97,23 @@ $(document).ready(function() {
 	});
 
 });
-function webRtcReady(){
-	if(socketReady && userMediaReady){
+function webRtcReady() {
+	if (socketReady && userMediaReady) {
 		console.log(socketReady);
-		console.log(userMediaReady);	
-		console.log('webrtc ready');	
-    if(hash){
-		socket.emit('rtc_join', {hash : hash});
-		}else{
-		socket.emit('rtc_join', you);
+		console.log(userMediaReady);
+		console.log('webrtc ready');
+		if (hash) {
+			socket.emit('rtc_join', {
+				hash: hash
+			});
+		} else {
+			socket.emit('rtc_join', you);
 		}
-	}
-}
-function doRequest(req) {
-	if (cstate != 'open') {
-		console.log('not in open state ignoring TODO respond');
-	} else {
-		console.log(req);
-
 	}
 }
 function channelJoin(user) {
 	if (usersList[user.id]) {
-	console.log('user already in channel');	
+		console.log('user already in channel');
 	} else {
 		usersList[user.id] = user;
 		renderList();
@@ -118,14 +123,14 @@ function channelExit(userid) {
 	if (usersList[userid]) {
 		delete usersList[userid];
 		renderList();
-	} else {}
+	}
 }
 function renderList() {
 	console.log('rendering new user list');
 	console.log(usersList);
 	$('#buddylistrows').html(jade.render('chat/list', {
-	  you: you,
-    users: usersList
+		you: you,
+		users: usersList
 	}));
 }
 function init() {
@@ -135,13 +140,29 @@ function init() {
 	getUserMedia();
 }
 function createPeerConnection() {
+	var pc_config = {
+		"iceServers": [{
+			"url": "stun:stun.l.google.com:19302"
+		}]
+	};
 	try {
-		pc = new webkitPeerConnection00("STUN stun.l.google.com:19302", onIceCandidate);
-		console.log("Created webkitPeerConnnection00 with config \"STUN stun.l.google.com:19302\".");
+		pc = new webkitRTCPeerConnection(pc_config);
+		pc.onicecandidate = onIceCandidate;
+		console.log("Created webkitRTCPeerConnection with config \"" + JSON.stringify(pc_config) + "\".");
 	} catch(e) {
-		console.log("Failed to create PeerConnection, exception: " + e.message);
-		alert("Cannot create PeerConnection object; Is the 'PeerConnection' flag enabled in about:flags?");
-		return;
+		try {
+			var stun_server = "";
+			if (pc_config.iceServers.length !== 0) {
+				stun_server = pc_config.iceServers[0].url.replace('stun:', 'STUN ');
+			}
+			pc = new webkitPeerConnection00(stun_server, onIceCandidate00);
+			isRTCPeerConnection = false;
+			console.log("Created webkitPeerConnnection00 with config \"" + stun_server + "\".");
+		} catch(e) {
+			console.log("Failed to create PeerConnection, exception: " + e.message);
+			alert("Cannot create PeerConnection object; Is the 'PeerConnection' flag enabled in about:flags?");
+			return;
+		}
 	}
 	pc.onconnecting = onSessionConnecting;
 	pc.onopen = onSessionOpened;
@@ -149,57 +170,82 @@ function createPeerConnection() {
 	pc.onremovestream = onRemoteStreamRemoved;
 }
 function maybeStart() {
-	if (!started && localStream ) {
+	if (!started && localStream) {
 		console.log("Creating PeerConnection.");
 		createPeerConnection();
 		console.log("Adding local stream.");
 		pc.addStream(localStream);
 		started = true;
-		if(initiator)
-			doCall();
+		if (initiator) doCall();
 	}
 }
 function doCall() {
 	console.log("Send offer to peer");
-	var offer = pc.createOffer({
-		audio: true,
-		video: true
-	});
-	pc.setLocalDescription(pc.SDP_OFFER, offer);
-	sendMessage({
-		type: 'offer',
-		sdp: offer.toSdp()
-	});
-	pc.startIce();
+	if (isRTCPeerConnection) {
+		pc.createOffer(setLocalAndSendMessage, null, mediaConstraints);
+	} else {
+		var offer = pc.createOffer(mediaConstraints);
+		pc.setLocalDescription(pc.SDP_OFFER, offer);
+		sendMessage({
+			type: 'offer',
+			sdp: offer.toSdp()
+		});
+		pc.startIce();
+	}
 }
 
 function doAnswer() {
 	console.log("Send answer to peer");
-	var offer = pc.remoteDescription;
-	var answer = pc.createAnswer(offer.toSdp(), {
-		audio: true,
-		video: true
-	});
-	pc.setLocalDescription(pc.SDP_ANSWER, answer);
-	sendMessage({
-		type: 'answer',
-		sdp: answer.toSdp()
-	});
-	pc.startIce();
+	if (isRTCPeerConnection) {
+		pc.createAnswer(setLocalAndSendMessage, null, mediaConstraints);
+	} else {
+		var offer = pc.remoteDescription;
+		var answer = pc.createAnswer(offer.toSdp(), mediaConstraints);
+		sendMessage({
+			type: 'answer',
+			sdp: answer.toSdp()
+		});
+		pc.startIce();
+	}
+}
+
+function setLocalAndSendMessage(sessionDescription) {
+	pc.setLocalDescription(sessionDescription);
+	sendMessage(sessionDescription);
 }
 
 function sendMessage(message) {
 	message.target = currentTarget;
 	socket.emit('rtc_request', message);
 }
+
 function processSignalingMessage(msg) {
 
 	if (msg.type === 'offer') {
 		// Callee creates PeerConnection
-		if (!initiator && ! started) maybeStart();
-		pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(msg.sdp));
+		if (!initiator && ! started)  
+			maybeStart();
+		// We only know JSEP version after createPeerConnection()
+		if (isRTCPeerConnection) pc.setRemoteDescription(new RTCSessionDescription(msg));
+		else pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(msg.sdp));
+
 		doAnswer();
 	} else if (msg.type === 'answer' && started) {
+		pc.setRemoteDescription(new RTCSessionDescription(msg));
+	} else if (msg.type === 'candidate' && started) {
+		var candidate = new RTCIceCandidate({
+			sdpMLineIndex: msg.label,
+			candidate: msg.candidate
+		});
+		pc.addIceCandidate(candidate);
+	} else if (msg.type === 'bye' && started) {
+		onRemoteHangup();
+	}
+}
+
+function processSignalingMessage00(message) {
+	var msg = JSON.parse(message);
+	if (msg.type === 'answer' && started) {
 		pc.setRemoteDescription(pc.SDP_ANSWER, new SessionDescription(msg.sdp));
 	} else if (msg.type === 'candidate' && started) {
 		var candidate = new IceCandidate(msg.label, msg.candidate);
@@ -233,7 +279,7 @@ function onUserMediaSuccess(stream) {
 	localVideo.style.opacity = 1;
 	localVideo.src = url;
 	localStream = stream;
-  $('#localTwitter').removeAttr('hidden');
+	$('#localTwitter').removeAttr('hidden');
 	userMediaReady = true;
 	webRtcReady();
 }
@@ -241,7 +287,18 @@ function onUserMediaError(error) {
 	console.log("Failed to get access to local media. Error code was " + error.code);
 	alert("Failed to get access to local media. Error code was " + error.code + ".");
 }
-function onIceCandidate(candidate, moreToFollow) {
+
+function onIceCandidate(event){
+	if (event.candidate) {
+		sendMessage({type: 'candidate',
+								 label: event.candidate.sdpMLineIndex,
+								 id: event.candidate.sdpMid,
+								 candidate: event.candidate.candidate});
+	} else {
+		console.log("End of candidates");
+	}
+}
+function onIceCandidate00(candidate, moreToFollow) {
 	if (candidate) {
 		sendMessage({
 			type: 'candidate',
@@ -274,6 +331,7 @@ function onHangup() {
 	console.log("Hanging up.");
 	started = false; // Stop processing any message
 	transitionToDone();
+	isRTCPeerConnection = true;
 	pc.close();
 	pc = null;
 }
@@ -295,7 +353,7 @@ function waitForRemoteVideo() {
 	}
 }
 function transitionToActive() {
-  $('#remoteTwitter').html('<img src="' + usersList[currentTarget].pic + '"/>');
+	$('#remoteTwitter').html('<img src="' + usersList[currentTarget].pic + '"/>');
 	remoteVideo.style.opacity = 1;
 }
 
@@ -308,7 +366,7 @@ function transitionToWaiting() {
 }
 
 function transitionToDone() {
-  $('#remoteTwitter').html('');
+	$('#remoteTwitter').html('');
 	localVideo.style.opacity = 0;
 	remoteVideo.style.opacity = 0;
 }
