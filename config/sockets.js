@@ -54,14 +54,16 @@ module.exports = function(server, config, auth) {
 				"handle": user.twitter.screen_name,
 				"id": user._id,
 				"pic": user.twitter.profile_image_url,
-				'status': 'open'
+				'status': 'open',
+        'type': 'socketio'
 			}
 			var userObj = {
 				"name": user.twitter.name,
 				"handle": user.twitter.screen_name,
 				"status": 'open',
 				"pic": user.twitter.profile_image_url,
-				"id": user._id
+				"id": user._id,
+        'type': 'socketio'
 			};
 
 			socket.join(user._id);

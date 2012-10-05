@@ -11,7 +11,10 @@ block main
         .controls.controls-row
           input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
           &nbsp; 
-          input(type='checkbox', name="phoneInChat", value=user.phoneInChat, placeholder=user.phoneInChat)
+          if(user.phoneInChat)
+            input(type='checkbox', name="phoneInChat", value=user.phoneInChat, checked="checked")
+          else 
+            input(type='checkbox', name="phoneInChat", value=user.phoneInChat)
           | &nbsp;
           | Phone Number Endpoint?
       .control-group
