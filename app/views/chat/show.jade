@@ -28,7 +28,7 @@ block main
 block extrajs
   script(src='/socket.io/socket.io.js');
   script(src='/js/templates.js');
-  script(src='/js/require.js', data-main='/js/conference.js')
+  script(src='/js/require.js', data-main='/js/chat.js')
   script#users_list(type='text/json')!=JSON.stringify(users)
   script#you(type='text/json')!=JSON.stringify(you)
   if thisIsHash
