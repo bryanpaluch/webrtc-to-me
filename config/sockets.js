@@ -4,6 +4,7 @@ User = mongoose.model('User'),
 parseCookie = require('cookie').parse,
 mongoStore = require('connect-mongodb'),
 redis = require("./redis"),
+phoneConnector = require("./phoneConnector"),
 User = mongoose.model('User'),
 shrt = require('short')
 
@@ -125,7 +126,11 @@ module.exports = function(server, config, auth) {
 			if (data.type == 'offer' || data.type == 'answer') {
 				socket.legs[target] = true;
 			}
+      if(data.targetType == 'phone'){
+        phoneConnector.sendMessage(data);
+      }else{
 			io.sockets. in (target).emit('rtc_request', data);
+      }
 		});
 	});
 

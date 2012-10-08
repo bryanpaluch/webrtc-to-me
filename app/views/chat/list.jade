@@ -8,4 +8,4 @@ each user in users
       if user.id == you._id
         p='You'
       else
-        button.btn.btn-primary(target=user.id, action='startChat')="Start Chat"
+        button.btn.btn-primary(target=user.id, action='startChat', "target_type"=user.type)="Start Chat"

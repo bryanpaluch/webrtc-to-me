@@ -84,8 +84,10 @@ $(document).ready(function() {
 		console.log(this);
 		var action = $(this).attr('action');
 		var target = $(this).attr('target');
+    var targetType = $(this).attr('target_type');
 		if (action == 'startChat') {
 			currentTarget = target;
+      currentTargetType = targetType;
 			$(":button").attr('disabled', 'disabled');
 			initiator = true;
 			maybeStart();
@@ -216,6 +218,7 @@ function setLocalAndSendMessage(sessionDescription) {
 
 function sendMessage(message) {
 	message.target = currentTarget;
+  message.targetType = currentTargetType
 	socket.emit('rtc_request', message);
 }
 

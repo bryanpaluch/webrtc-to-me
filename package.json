@@ -33,7 +33,8 @@
     "cookie" : "latest",
     "socket.io" : "latest",
     "short" : "latest",
-    "ua-parser" : "latest"
+    "ua-parser" : "latest",
+    "restify" : "latest"
   },
   "main": "server.js",
   "directories": {
