@@ -64,7 +64,7 @@ function bootApplication(app, config, passport) {
     app.use(passport.session())
 
     app.use(express.favicon())
-
+    app.use(express.errorHandler({showStack: true, dumpExceptions: true}));
     // routes should be at the last
     app.use(app.router)
 
@@ -90,6 +90,6 @@ function bootApplication(app, config, passport) {
 
   })
 
-  app.set('showStackError', false)
+  app.set('showStackError', true)
 
 }

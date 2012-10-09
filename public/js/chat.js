@@ -8,7 +8,8 @@ var status;
 var pc;
 var initiator;
 var started = false;
-var currenTarget;
+var currentTarget;
+var currentTargetType;
 var you;
 var hash = null;
 var socketReady = false;
@@ -92,10 +93,10 @@ $(document).ready(function() {
 			initiator = true;
 			maybeStart();
 		}
-		socket.emit('rtc_request', {
-			'action': action,
-			'target': target
-		});
+	//	socket.emit('rtc_request', {
+	//		'action': action,
+	//		'target': target
+	//	});
 	});
 
 });
@@ -218,7 +219,7 @@ function setLocalAndSendMessage(sessionDescription) {
 
 function sendMessage(message) {
 	message.target = currentTarget;
-  message.targetType = currentTargetType
+  message.targetType = currentTargetType;
 	socket.emit('rtc_request', message);
 }
 
@@ -296,8 +297,11 @@ function onIceCandidate(event){
 		sendMessage({type: 'candidate',
 								 label: event.candidate.sdpMLineIndex,
 								 id: event.candidate.sdpMid,
-								 candidate: event.candidate.candidate});
+								 candidate: event.candidate.candidate,
+                 });
 	} else {
+		sendMessage({type: 'icefinished',
+                });
 		console.log("End of candidates");
 	}
 }

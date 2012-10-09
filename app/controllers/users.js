@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
 _ = require('underscore'),
 User = mongoose.model('User'),
 shrt = require('short'),
-redis = require('./../../config/redis');
+redis = require('./../../interfaces/redis');
 
 shrt.connect('mongodb://localhost/webrtc-me');
 shrt.connection.on('error', function(error) {

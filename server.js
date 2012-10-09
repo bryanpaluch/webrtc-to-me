@@ -29,9 +29,9 @@ require('./config/passport').boot(passport, config)
 
 require('./settings').boot(app, config, passport)         // Bootstrap application settings
 
-// Bootstrap routes
-require('./config/routes')(app, passport, auth)
-require('./config/sockets')(server, config, auth)
+// Bootstrap interfaces
+require('./interfaces/routes')(app, passport, auth)
+require('./interfaces/sockets')(server, config, auth)
 // Start the app by listening on <port>
 var port = process.env.PORT || 3000
 server.listen(port)

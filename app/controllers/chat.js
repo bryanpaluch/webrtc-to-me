@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
 _ = require('underscore'),
-redis = require("../../config/redis"),
+redis = require("../../interfaces/redis"),
 Member = mongoose.model('Member'),
 shrt = require('short');
 
