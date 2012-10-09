@@ -43,7 +43,7 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://bryanpaluch@github.com/Comcast/conference-me-maybe.git"
+    "url": "https://bryanpaluch@github.com/bryanpaluch/webrtc-to-me.git"
   },
   "license": "BSD",
   "keywords": [
