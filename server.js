@@ -11,7 +11,7 @@ require('express-namespace')
 // Load configurations
 var env = process.env.NODE_ENV || 'development'
   , config = require('./config/config')[env]
-  , auth = require('./authorization')
+  , auth = require('./app/controllers/authorization')
 // Bootstrap db connection
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
