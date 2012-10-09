@@ -32,6 +32,8 @@ require('./settings').boot(app, config, passport)         // Bootstrap applicati
 // Bootstrap interfaces
 require('./interfaces/routes')(app, passport, auth)
 require('./interfaces/sockets')(server, config, auth)
+require('./interfaces/phoneConnector').Endpoint(app, config);
+
 // Start the app by listening on <port>
 var port = process.env.PORT || 3000
 server.listen(port)

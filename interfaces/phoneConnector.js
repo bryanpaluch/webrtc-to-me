@@ -5,6 +5,11 @@ var client = restify.createJsonClient({
 });
 
 var sessions = {};
+exports.Endpoint = function(app, config){
+
+
+}
+
 exports.sendMessage = function(data) {
 	switch (data.type) {
 	case 'offer':

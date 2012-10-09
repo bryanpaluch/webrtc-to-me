@@ -4,7 +4,7 @@ User = mongoose.model('User'),
 parseCookie = require('cookie').parse,
 mongoStore = require('connect-mongodb'),
 redis = require("./redis"),
-phoneConnector = require("./phoneConnector"),
+phoneConnectorSendMessage = require("./phoneConnector").sendMessage,
 User = mongoose.model('User'),
 shrt = require('short')
 
@@ -74,7 +74,6 @@ module.exports = function(server, config, auth) {
 
 		});
 		socket.on('disconnect', function() {
-			console.log(socket.user.id + "left the chat");
 			io.sockets. in (socket.chatChannel).emit('rtc_status', {
 				channelExit: socket.user.id
 			});
@@ -87,10 +86,7 @@ module.exports = function(server, config, auth) {
 			}
 		});
 		socket.on('rtc_join', function(data) {
-			console.log('Got channel join request');
-			console.log(data);
 			if (data.hash) {
-				console.log('User requested to join channel hash ' + data.hash);
 				shrt.retrieve(data.hash, function(err, shortObj) {
 					if (err) throw Error(err);
 					if (shortObj) {
@@ -101,16 +97,13 @@ module.exports = function(server, config, auth) {
 							channelJoin: socket.user
 						});
 					} else {
-						console.log("Someone tried to join a room that didn't exist, reloading their code");
 						socket.emit('rtc_reload', {
 							"destination": '/'
 						});
 					}
 				});
 			} else {
-				console.log('User will join their own channel');
 				socket.chatChannel = socket.user.id + '-owner';
-				console.log(socket.user);
 				redis.joinChannel(socket.user.id + '-owner', socket.user.id, socket.user);
 				socket.join(socket.user.id + '-owner');
 				io.sockets. in (socket.user.id + '-owner').emit('rtc_status', {
@@ -127,10 +120,8 @@ module.exports = function(server, config, auth) {
 				socket.legs[target] = true;
 			}
       if(data.targetType == 'phone'){
-        console.log("sending to phone connector");
-        phoneConnector.sendMessage(data);
+        phoneConnectorSendMessage(data);
       }else{
-        console.log("sending to iosocket");
 			io.sockets. in (target).emit('rtc_request', data);
       }
 		});

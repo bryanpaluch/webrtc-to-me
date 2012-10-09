@@ -19,13 +19,8 @@ function bootApplication(app, config, passport) {
 				baseUrl: __dirname,
 				nodeRequire: require
 				})
-	// requirejs(['lib/jade-compile'], function(jadeCompile) {
-	// 	jadeCompile('app/views/conference', 'public/templates/conference', {
-	// 		client: true,
-	// 		compileDebug: true
-	// 	})
-	// })
-	global.shortUrl = config.shortUrl;
+	
+  global.shortUrl = config.shortUrl;
   app.set('showStackError', true)
   app.use(express.static(__dirname + '/public'))
   app.use(jade_browser('/js/templates.js', '**', {root: __dirname + '/app/views'}))
