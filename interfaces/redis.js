@@ -4,10 +4,9 @@ var rclient = redis.createClient(null,null, {detect_buffers:true});
 var users = {};
 
 rclient.on("error", function(err){
-  console.log("Error " + err);
+  console.log("Redis error " + err);
 });
 rclient.flushall(function(err){
-console.log("flush complete");
 });
 
 exports.joinChannel = function (channel,id, userObj){
@@ -23,6 +22,7 @@ exports.joinChannel = function (channel,id, userObj){
 	//rclient.HMSET(id, userObj);
 
 }
+
 exports.exitChannel = function (channel, id){
 	rclient.srem(channel, id);
 	//rclient.hdel(id);
