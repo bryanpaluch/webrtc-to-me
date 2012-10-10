@@ -61,7 +61,7 @@ UserSchema.path('username').validate(function (username) {
 // pre save hooks
 UserSchema.pre('save', function(next) {
   if (!this.isNew) return next()
-
+  console.log('presave hook ' + this.chatUrl);
   if (!validatePresenceOf(this.password) && authTypes.indexOf(this.provider) === -1)
     next(new Error('Invalid password'))
   else

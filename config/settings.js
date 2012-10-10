@@ -19,15 +19,17 @@ function bootApplication(app, config, passport) {
 				baseUrl: __dirname,
 				nodeRequire: require
 				})
-	
+  console.log(config.shortUrl);	
   global.shortUrl = config.shortUrl;
   app.set('showStackError', true)
-  app.use(express.static(__dirname + '/public'))
-  app.use(jade_browser('/js/templates.js', '**', {root: __dirname + '/app/views'}))
+  app.use(express.static(__dirname + '/../public'))
+  app.use(jade_browser('/js/templates.js', '**', 
+                       {root: __dirname + '/../app/views'}))
   app.use(express.logger(':method :url :status'))
 
   // set views path, template engine and default layout
-  app.set('views', __dirname + '/app/views')
+  console.log(__dirname + '/../app/views');
+  app.set('views', __dirname + '/../app/views')
   app.set('view engine', 'jade')
 
   app.configure(function () {

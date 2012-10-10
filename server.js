@@ -26,8 +26,8 @@ model_files.forEach(function (file) {
 
 // bootstrap passport config
 require('./config/passport').boot(passport, config)
-
-require('./config/settings').boot(app, config, passport)         // Bootstrap application settings
+//bootstrap express settings
+require('./config/settings').boot(app, config, passport)
 
 // Bootstrap interfaces
 require('./interfaces/routes')(app, passport, auth)
