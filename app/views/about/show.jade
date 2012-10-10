@@ -1,0 +1,15 @@
+extends ../layouts/default
+
+block main
+  .user_edit.hero-unit
+    h1='WebRTC With me?'
+    br
+    p='WebRTC with me is a quick way of creating disposable chatrooms with friends, enemies, and strangers. It uses html5 WebRTC javascript api\'s to set up a peer to peer voice and video chat between you and whoever. No plugins are need but you will need a dev-channel release of chrome to get started. Click the chat button above to be put into your own personal chat. Then send your chat url to whoever you want to chat with. Authentication is handled by twitter oauth so you don\'t have to sign up for anything new, and don\'t worry about handing out your chat url, you can always regenerate it on your profile page.'
+    br
+    p='More features coming soon, including leaving a way to call your cellphone number from in the browser'
+    br
+    br
+    p='Get the newest chrome dev channel release here'
+    a.btn.btn-primary.btn-large(href='http://www.chromium.org/getting-involved/dev-channel')="Get it here"
+block extrajs
+

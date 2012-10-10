@@ -6,6 +6,10 @@ var mongoose = require('mongoose')
   , uaParser = require('ua-parser');
 
 module.exports = function (app, passport, auth) {
+  
+  app.get('/about',function(req,res){
+    res.render('about/show');
+  });
 	// conference routes
   var chat = require('../app/controllers/chat')
 	app.get('/chat',auth.requiresLogin,checkBrowser, chat.show);	
@@ -66,6 +70,7 @@ module.exports = function (app, passport, auth) {
 			} 
 	}
   // home route
-  app.get('/', checkBrowser, auth.requiresLogin, chat.show)
+  app.get('/', function(req, res){
+         res.redirect('/about');});
   app.get('/*', checkBrowser);
 }
