@@ -1,0 +1,36 @@
+extends ../layouts/default
+
+block main
+  .row
+    .span4.container
+      #selfView.well.row
+        twitterIcon#localTwitter.overlay_item(hidden=true)
+          img(src=you.twitter.profile_image_url)
+        video#localVideo(width="100%", height="100%", autoplay="autoplay")
+      #buddylist.well.row
+        p='WebRTC With Me Link'
+        if thisIsHash
+          #shortUrl.span.input-xlarge.uneditable-input=global.shortUrl + hash
+        else  
+          #shortUrl.span.input-xlarge.uneditable-input=global.shortUrl + you.chatUrl
+        table.table.table-striped.table-bordered
+          thead
+            tr
+              th 
+              th Person
+              th Action
+          tbody#buddylistrows
+            include list
+    .span8.container
+      #chatarea.well
+        twitterIcon#remoteTwitter.overlay_item
+        video#remoteVideo(width="100%", height="100%", autoplay="autoplay")
+block extrajs
+  script(src='/socket.io/socket.io.js');
+  script(src='/js/templates.js');
+  script(src='/js/require.js', data-main='/js/chat.js')
+  script#users_list(type='text/json')!=JSON.stringify(users)
+  script#you(type='text/json')!=JSON.stringify(you)
+  if thisIsHash
+    script#hash(type='text/json')!=hash
+
