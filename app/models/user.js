@@ -5,6 +5,7 @@ var mongoose = require('mongoose')
   , crypto = require('crypto')
   , _ = require('underscore')
   , authTypes = ['github', 'twitter', 'facebook', 'google']
+  , shrt = require('../../interfaces/shrt')
 
 var UserSchema = new Schema({
     name: String
@@ -60,10 +61,19 @@ UserSchema.path('username').validate(function (username) {
 
 // pre save hooks
 UserSchema.pre('save', function(next) {
-  if (!this.isNew) return next()
-  console.log('presave hook ' + this.chatUrl);
+  console.log('presave hook ' + this.chatUrl + ' id ' + this._id);
   if (!validatePresenceOf(this.password) && authTypes.indexOf(this.provider) === -1)
     next(new Error('Invalid password'))
+  if(!this.chatUrl) this.chatUrl= '';
+  if(this.chatUrl == ''){
+    console.log('generating new chaturl inside of Model pre');
+    var self = this;
+    shrt.generate(this._id,function(err, shortObj){
+      self.chatUrl = shortObj.hash;
+      console.log(self);
+      next();
+    });
+  }
   else
     next()
 })

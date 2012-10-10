@@ -6,12 +6,8 @@ mongoStore = require('connect-mongodb'),
 redis = require("./redis"),
 phoneConnectorSendMessage = require("./phoneConnector").sendMessage,
 User = mongoose.model('User'),
-shrt = require('short')
+shrt = require('./shrt')
 
-shrt.connect('mongodb://localhost/webrtc-me');
-shrt.connection.on('error', function(error) {
-	throw new Error(error);
-});
 
 module.exports = function(server, config, auth) {
 

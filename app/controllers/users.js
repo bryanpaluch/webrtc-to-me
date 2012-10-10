@@ -1,13 +1,9 @@
 var mongoose = require('mongoose'),
 _ = require('underscore'),
 User = mongoose.model('User'),
-shrt = require('short'),
+shrt = require('./../../interfaces/shrt'),
 redis = require('./../../interfaces/redis');
 
-shrt.connect('mongodb://localhost/webrtc-me');
-shrt.connection.on('error', function(error) {
-	throw new Error(error);
-});
 
 exports.signin = function(req, res) {}
 
@@ -67,14 +63,13 @@ exports.update = function(req, res) {
 	else req.body.phoneInChat = false;
 
 	if (req.body.regenerate == 'on') {
-		shrt.generate(user.id, function(error, shrtObj) {
-			req.body.chatUrl = shrtObj.hash;
+			req.body.chatUrl = '';
 			user = _.extend(user, req.body);
 			user.save(function(err, doc) {
 				if (err) {
 					res.render('users/show', {
 						title: 'Edit User',
-						user: user,
+						user: doc,
 						errors: err.errors
 					});
 				}
@@ -83,7 +78,6 @@ exports.update = function(req, res) {
 				}
 			});
 
-		});
 		if (oldShort) {
 			shrt.retrieve(oldShort, function(error, oldShortObj) {
 				if (error) throw Error(error);
