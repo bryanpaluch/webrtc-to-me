@@ -4,10 +4,11 @@ User = mongoose.model('User'),
 parseCookie = require('cookie').parse,
 mongoStore = require('connect-mongodb'),
 redis = require("./redis"),
-phoneConnectorSendMessage = require("./phoneConnector").sendMessage,
+phoneConnector = require("./phoneConnector"),
 User = mongoose.model('User'),
-shrt = require('./shrt')
-
+shrt = require('./shrt'),
+util = require('util'),
+pc = phoneConnector.createConnector();
 
 module.exports = function(server, config, auth) {
 
@@ -62,7 +63,6 @@ module.exports = function(server, config, auth) {
 				"id": user._id,
         'type': 'socketio'
 			};
-
 			socket.join(user._id);
 			socket.emit('rtc_status', {
 				ready: true
@@ -107,6 +107,14 @@ module.exports = function(server, config, auth) {
 				});
 			}
 		})
+    pc.on('event', function(data){
+      var target = data.target;
+      io.sockets.in(target).emit('rtc_request', data);
+      console.log('sent to client ' + target);
+      if(data.type == 'offer' || data.type == 'answer'){
+        socket.legs[target] = true;
+      }
+    });
 		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(data);
@@ -116,7 +124,8 @@ module.exports = function(server, config, auth) {
 				socket.legs[target] = true;
 			}
       if(data.targetType == 'phone'){
-        phoneConnectorSendMessage(data);
+        console.log(pc);
+        pc.send(data);
       }else{
 			io.sockets. in (target).emit('rtc_request', data);
       }

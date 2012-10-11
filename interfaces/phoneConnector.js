@@ -3,54 +3,97 @@ var client = restify.createJsonClient({
 	version: '*',
 	url: 'http://127.0.0.1:8080'
 });
-
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
+var _ = require('underscore');
+var app;
 var sessions = {};
-exports.Endpoint = function(app, config){
+var targets = {};
 
-
+exports.Endpoint = function(ExpressInstance, config){
+  app = ExpressInstance; 
 }
 
-exports.sendMessage = function(data) {
-	switch (data.type) {
-	case 'offer':
-		doOffer(data);
-		break;
-	case 'candidate':
-		doCandidate(data);
-		break;
-	case 'answer':
-		doAnswer(data);
-		break;
-  case 'icefinished':
-    data.type = 'candidate';
-    data['last'] = true;
-    doCandidate(data);
-    break;
-	default:
-		console.log("Error no matching case for sendMessage data type - phone Connector");
-	}
+function PhoneConnector() {
+  var self = this;
+  app.post('/session/:uuid', function(req, res){
+    var message = req.body; 
+    console.log('someone messaged phoneConnector back');
+    console.log(message); 
+    if(message){
+      if(message.type == 'answer'){
+        console.log('got message of answer type');
+        message['target'] = targets[req.params.uuid];
+        self.emit('event',message);
+        }
+      else if(message.type = 'candidates'){
+        console.log('got candidates type');
+        for(var i = 0; i < message.candidates.length; i++){
+                var candidate = message.candidates[i];
+                console.log(candidate);
+                candidate['target'] = targets[req.params.uuid]; 
+                self.emit('event',candidate);
+            } 
+        }
+      else
+        {
+          console.log('no match for message type in phoneConnector');
+        }
+    }
+    else
+      console.log('no body');
 
+    res.send(200);
+  });
+  console.log('Phone Connector established');
+
+} 
+
+util.inherits(PhoneConnector, EventEmitter);
+
+PhoneConnector.prototype.send = function(data){
+  	  switch (data.type) {
+  	  case 'offer':
+  	  	doOffer(data);
+  	  	break;
+  	  case 'candidate':
+  	  	doCandidate(data);
+  	  	break;
+  	  case 'answer':
+     		doAnswer(data);
+  		break;
+      case 'icefinished':
+       data.type = 'candidate';
+       data['last'] = true;
+       doCandidate(data);
+       break;
+  	  default:
+  	  	console.log("Error no matching case for sendMessage data type - phone Connector");
+	   }
 }
+
+exports.PhoneConnector = PhoneConnector;
 
 function doOffer(data) {
   var target = data.target;
   var offerData = data;
   sessions[target] = {active : false, candidates: [], uuid : null};
 	client.post('/session', {phoneNumber: '1002',
-		callbackUrl: 'http://127.0.0.1:3001/session'
+		callbackUrl: 'http://127.0.0.1:3000/session/'
 	},
 	function(err, req, res, data) {
 		if (err) 
-			throw new Error(err);
+			return new Error(err);
 		else {
 			if (!data.session) {
         console.log(data);
-				throw new Error('phoneConnecter: invalid response from POST /session');
+				return new Error('phoneConnecter: invalid response from POST /session');
 			}
       console.log('phoneConnect: Got a response from session POST');
       console.log(data);
 			var uuid = data.uuid;
       console.log('phoneConnector: session created ' + uuid + ' for target ' + target);
+      targets[uuid] = target;
       sessions[target].uuid = uuid;
       sessions[target].active = true;
       console.log(sessions[target]);
@@ -59,7 +102,7 @@ function doOffer(data) {
       client.put('/session/' + uuid, offerData, function(err, req, res, data){
         if(err){
           console.log('phoneConnector: session SDP put failed');
-          throw new Error(err);
+          return new Error(err);
         }
         else{
           console.log('sent session sdp' + uuid);
@@ -80,7 +123,7 @@ function doCandidate(data) {
     if(sessions[target].active == true){
       client.put('/session/' + sessions[target].uuid,data, function (err, req, res, data){
         if(err)
-          throw new Error(err);
+          return new Error(err);
         else{
           console.log('sent candidate');
         }
@@ -96,3 +139,8 @@ function doAnswer(data) {
 
 }
 
+exports.createConnector = function(){
+  var connector = new PhoneConnector();
+  console.log(connector);
+  return connector;
+};

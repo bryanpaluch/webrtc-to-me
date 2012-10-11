@@ -69,6 +69,7 @@ $(document).ready(function() {
 	});
 	socket.on('rtc_request', function(req) {
 		currentTarget = req.target;
+    console.log(req);
 		$(":button").attr('disabled', 'disabled');
 		if (isRTCPeerConnection)	
 			processSignalingMessage(req);
@@ -249,6 +250,7 @@ function processSignalingMessage(msg) {
 
 function processSignalingMessage00(message) {
 	var msg = JSON.parse(message);
+  console.log(msg);
 	if (msg.type === 'answer' && started) {
 		pc.setRemoteDescription(pc.SDP_ANSWER, new SessionDescription(msg.sdp));
 	} else if (msg.type === 'candidate' && started) {
