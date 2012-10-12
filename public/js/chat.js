@@ -172,6 +172,7 @@ function createPeerConnection() {
 	pc.onopen = onSessionOpened;
 	pc.onaddstream = onRemoteStreamAdded;
 	pc.onremovestream = onRemoteStreamRemoved;
+  pc.onnegotiationneeded = onNegotiationNeeded;
 }
 function maybeStart() {
 	if (!started && localStream) {
@@ -293,15 +294,20 @@ function onUserMediaError(error) {
 	console.log("Failed to get access to local media. Error code was " + error.code);
 	alert("Failed to get access to local media. Error code was " + error.code + ".");
 }
-
+function onNegotiationNeeded(event){
+  console.log('negoiation needed');
+  console.log(event);
+}
 function onIceCandidate(event){
 	if (event.candidate) {
+    console.log(event);
 		sendMessage({type: 'candidate',
 								 label: event.candidate.sdpMLineIndex,
 								 id: event.candidate.sdpMid,
 								 candidate: event.candidate.candidate,
                  });
 	} else {
+    console.log(event);
 		sendMessage({type: 'icefinished',
                 });
 		console.log("End of candidates");

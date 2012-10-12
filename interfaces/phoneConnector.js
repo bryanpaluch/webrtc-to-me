@@ -26,7 +26,7 @@ function PhoneConnector() {
         message['target'] = targets[req.params.uuid];
         self.emit('event',message);
         }
-      else if(message.type = 'candidates'){
+      else if(message.type == 'candidates'){
         console.log('got candidates type');
         for(var i = 0; i < message.candidates.length; i++){
                 var candidate = message.candidates[i];
