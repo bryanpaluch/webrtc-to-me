@@ -107,6 +107,11 @@ module.exports = function(server, config, auth) {
 				});
 			}
 		})
+    socket.on('rtc_chat', function(data){
+      io.sockets.in(socket.chatChannel).emit('rtc_status', { 
+         message: data, user: {name: socket.user.name}}
+      );
+    });
 		socket.on('rtc_request', function(data) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(data);

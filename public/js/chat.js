@@ -65,7 +65,10 @@ $(document).ready(function() {
 		} else if (data.ready) {
 			socketReady = true;
 			webRtcReady();
-		}
+		} else if (data.message){
+       
+      addToChatLog(data.user.name,  data.message);
+    }
 	});
 	socket.on('rtc_request', function(req) {
 		currentTarget = req.target;
@@ -87,13 +90,21 @@ $(document).ready(function() {
 		var action = $(this).attr('action');
 		var target = $(this).attr('target');
     var targetType = $(this).attr('target_type');
-		if (action == 'startChat') {
+		if (action === 'startChat') {
 			currentTarget = target;
       currentTargetType = targetType;
 			$(":button").attr('disabled', 'disabled');
 			initiator = true;
 			maybeStart();
 		}
+    else if( action === 'sendtext'){
+      var data = $(target).val();
+      console.log(data);
+      if(data){
+        socket.emit('rtc_chat', data);
+        $(target).val('');
+        }
+    }
 	//	socket.emit('rtc_request', {
 	//		'action': action,
 	//		'target': target
@@ -101,6 +112,11 @@ $(document).ready(function() {
 	});
 
 });
+
+function addToChatLog( who, data){
+  var newline = who + ": " + data + "\n"; 
+  $("#chatlog").val($("#chatlog").val() + newline);
+}
 function webRtcReady() {
 	if (socketReady && userMediaReady) {
 		console.log(socketReady);
@@ -121,7 +137,8 @@ function channelJoin(user) {
 	} else {
 		usersList[user.id] = user;
 		renderList();
-	}
+    addToChatLog('announce',  user.name+ " has joined the chat");
+  }
 }
 function channelExit(userid) {
 	if (usersList[userid]) {
@@ -370,6 +387,7 @@ function waitForRemoteVideo() {
 function transitionToActive() {
 	$('#remoteTwitter').html('<img src="' + usersList[currentTarget].pic + '"/>');
 	remoteVideo.style.opacity = 1;
+	$('#endcall').removeAttr('hidden');
 }
 
 function transitionToWaiting() {
@@ -378,6 +396,7 @@ function transitionToWaiting() {
 	},
 	500);
 	remoteVideo.style.opacity = 0;
+	$('#endcall').attr('hidden', 'hidden');
 }
 
 function transitionToDone() {
