@@ -112,10 +112,16 @@ $(document).ready(function() {
 	});
 
 });
-
+$("#chatInput").keydown(function(event){
+  if(event.keyCode == 13){
+    console.log('enter pressed');
+    $("#sendText").click();
+  }
+});
 function addToChatLog( who, data){
   var newline = who + ": " + data + "\n"; 
   $("#chatlog").val($("#chatlog").val() + newline);
+  $("#chatlog").scrollTop(999999); 
 }
 function webRtcReady() {
 	if (socketReady && userMediaReady) {
@@ -387,7 +393,12 @@ function waitForRemoteVideo() {
 function transitionToActive() {
 	$('#remoteTwitter').html('<img src="' + usersList[currentTarget].pic + '"/>');
 	remoteVideo.style.opacity = 1;
-	$('#endcall').removeAttr('hidden');
+  $("#statusarea").animate({opacity: 0},600, function(){
+      $("#statusarea").hide();
+      $("#chatarea").show();
+      $("#chatarea").animate({opacity:1}, 300);
+  });
+
 }
 
 function transitionToWaiting() {
@@ -396,7 +407,11 @@ function transitionToWaiting() {
 	},
 	500);
 	remoteVideo.style.opacity = 0;
-	$('#endcall').attr('hidden', 'hidden');
+  $("#chatarea").animate({opacity: 0},600, function(){
+      $("#chatarea").hide();
+      $("statusarea").show();
+      $("#statusarea").animate({opacity:1}, 300);
+  });
 }
 
 function transitionToDone() {

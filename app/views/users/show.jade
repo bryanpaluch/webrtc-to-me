@@ -1,31 +1,32 @@
 extends ../layouts/default
 
 block main
-  .user_edit.row.span12
-    h1=user.name
-    - var action = '/users/'+user.id
-    form.row.form-horizontal(method="post", action=action)
-      input(type="hidden", name="_method", value="PUT") 
-      .control-group
-        label.control-label(for='phoneNumber') Phone Number
-        .controls.controls-row
-          input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
-          &nbsp; 
-          if(user.phoneInChat)
-            input(type='checkbox', name="phoneInChat", value=user.phoneInChat, checked="checked")
-          else 
-            input(type='checkbox', name="phoneInChat", value=user.phoneInChat)
-          | &nbsp;
-          | Phone Number Endpoint?
-      .control-group
-        label.control-label(for='chatUrl') WebRTC With Me Link
-        .controls.controls-row
-          #shortUrl.span.input-xlarge.uneditable-input=global.shortUrl + user.chatUrl 
+  .container
+    .row.span10.boxed
+      h1=user.name
+      - var action = '/users/'+user.id
+      form.row.form-horizontal(method="post", action=action)
+        input(type="hidden", name="_method", value="PUT") 
+        .control-group
+          label.control-label(for='phoneNumber') Phone Number
+          .controls.controls-row
+            input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
+            &nbsp; 
+            if(user.phoneInChat)
+              input(type='checkbox', name="phoneInChat", value=user.phoneInChat, checked="checked")
+            else 
+              input(type='checkbox', name="phoneInChat", value=user.phoneInChat)
+            | &nbsp;
+            | Phone Number Endpoint?
+        .control-group
+          label.control-label(for='chatUrl') WebRTC With Me Link
+          .controls.controls-row
+            #shortUrl.span.input-xlarge.uneditable-input=global.shortUrl + user.chatUrl 
+            &nbsp;
+            input(type='checkbox', name="regenerate", value=user.regenerate, placeholder=false) 
+            | &nbsp;
+            | Regenerate?
+        .form-actions
+          button.btn.btn-primary(type='submit') Save changes
           &nbsp;
-          input(type='checkbox', name="regenerate", value=user.regenerate, placeholder=false) 
-          | &nbsp;
-          | Regenerate?
-      .form-actions
-        button.btn.btn-primary(type='submit') Save changes
-        &nbsp;
-        a.btn(href='/members', title="cancel") Cancel
+          a.btn(href='/members', title="cancel") Cancel

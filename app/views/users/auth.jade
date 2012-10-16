@@ -2,11 +2,13 @@ extends ../layouts/default
 
 block main
 
-block content
-  .row.span8
-    p="Please login using twitter"
-  .row
-    .span8
-      a(href="/auth/twitter")
-        img(src="/img/twitter.png")
+  block content
+  .container.well
+    .row
+      .span8.offset4
+        p="Please login using twitter"
+    .row
+      .span8.offset4
+        a(href="/auth/twitter")
+          img(src="/img/twitter.png")
 
