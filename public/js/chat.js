@@ -93,11 +93,16 @@ $(document).ready(function() {
 		if (action === 'startChat') {
 			currentTarget = target;
       currentTargetType = targetType;
-			$(this).html("End Chat");
-      $(this).attr('action', 'endChat');
-			initiator = true;
+		  onListChange(target,'oncall');	
+      initiator = true;
 			maybeStart();
-		}
+		}else if (action === 'endChat'){
+      onListChange(target,'open');
+		  sendMessage({
+		  	type: 'bye',
+		  });
+      onHangup();
+    }
     else if( action === 'sendtext'){
       var data = $(target).val();
       console.log(data);
@@ -147,6 +152,10 @@ function channelJoin(user) {
     addToChatLog('announce',  user.name+ " has joined the chat");
   }
 }
+function onListChange(userid,status){
+  usersList[userid].status = status;
+  renderList();
+}
 function channelExit(userid) {
 	if (usersList[userid]) {
 		delete usersList[userid];
@@ -177,6 +186,12 @@ function createPeerConnection() {
 		pc = new webkitRTCPeerConnection(pc_config);
 		pc.onicecandidate = onIceCandidate;
 		console.log("Created webkitRTCPeerConnection with config \"" + JSON.stringify(pc_config) + "\".");
+    if(currentTargetType === 'phone'){
+      var mediaConstraints = {
+	    'has_audio': true,
+	    'has_video': false 
+      };
+    }
 	} catch(e) {
 		try {
 			var stun_server = "";
@@ -252,7 +267,7 @@ function sendMessage(message) {
 function processSignalingMessage(msg) {
 
 	if (msg.type === 'offer') {
-		$("[target=" +currentTarget+"]").html('End Chat').attr('action','endChat');
+		onListChange(currentTarget,'oncall');	
 		// Callee creates PeerConnection
 		if (!initiator && ! started)  
 			maybeStart();
@@ -262,6 +277,10 @@ function processSignalingMessage(msg) {
 
 		doAnswer();
 	} else if (msg.type === 'answer' && started) {
+    if(msg.voiceOnly)
+      voiceOnly = true;
+    console.log(voiceOnly);
+    console.log('got ansewr');
 		pc.setRemoteDescription(new RTCSessionDescription(msg));
 	} else if (msg.type === 'candidate' && started) {
 		var candidate = new RTCIceCandidate({
@@ -269,13 +288,13 @@ function processSignalingMessage(msg) {
 			candidate: msg.candidate
 		});
 		pc.addIceCandidate(candidate);
+    console.log(pc);
 	} else if (msg.type === 'bye' && started) {
 		onRemoteHangup();
 	}
 }
 
-function processSignalingMessage00(message) {
-	var msg = JSON.parse(message);
+function processSignalingMessage00(msg) {
   console.log(msg);
 	if (msg.type === 'answer' && started) {
 		pc.setRemoteDescription(pc.SDP_ANSWER, new SessionDescription(msg.sdp));
@@ -349,6 +368,7 @@ function onIceCandidate00(candidate, moreToFollow) {
 		});
 	}
 	if (!moreToFollow) {
+		sendMessage({type: 'icefinished'});
 		console.log("End of candidates.");
 	}
 }
@@ -356,6 +376,8 @@ function onSessionConnecting(message) {
 	console.log("Session connecting.");
 }
 function onSessionOpened(message) {
+  console.log(this);
+  console.log(message);
 	console.log("Session opened.");
 }
 function onRemoteStreamAdded(event) {
@@ -372,7 +394,7 @@ function onRemoteStreamRemoved(event) {
 function onHangup() {
 	console.log("Hanging up.");
 	started = false; // Stop processing any message
-	transitionToDone();
+	transitionToWaiting();
 	isRTCPeerConnection = true;
 	pc.close();
 	pc = null;
@@ -380,6 +402,7 @@ function onHangup() {
 
 function onRemoteHangup() {
 	console.log('Session terminated.');
+	onListChange(currentTarget,'open');	
 	started = false; // Stop processing any message
 	transitionToWaiting();
 	pc.close();
@@ -414,9 +437,10 @@ function transitionToActive() {
 function transitionToWaiting() {
   if(voiceOnly){
    $("#statusarea").animate({opacity:0},600, function(){
-     $("#statusarea").val("<h1>Waiting to WebRTCwith someone</h1>");
+     $("#statusarea").val("<h1>Waiting to WebRTCwith someone...</h1>");
      $("#statusarea").animate({opacity:1},300);
     });
+    voiceOnly = false;
   }else{
 	setTimeout(function() {
 		remoteVideo.src = ""

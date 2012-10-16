@@ -7,5 +7,8 @@ each user in users
     td
       if user.id == you._id
         p='You'
-      else
+      else if user.status == 'open'
         button.btn.btn-primary(target=user.id, action='startChat', "target_type"=user.type)="Start Chat"
+      else if user.status == 'oncall'
+        button.btn.btn-danger(target=user.id, action='endChat', "target_type"=user.type)="End Chat"
+

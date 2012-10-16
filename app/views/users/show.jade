@@ -1,8 +1,8 @@
 extends ../layouts/default
 
 block main
-  .container
-    .row.span10.boxed
+  .container-fluid
+    .row.span11.boxed
       h1=user.name
       - var action = '/users/'+user.id
       form.row.form-horizontal(method="post", action=action)
