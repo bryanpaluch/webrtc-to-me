@@ -3,10 +3,10 @@ extends ../layouts/default
 block main
   .row-fluid
     .span4.padding
-      #selfView.boxed.row-fluid
+      #selfView.boxed.fadedout.row-fluid
         twitterIcon#localTwitter.overlay_item(hidden=true)
           img.img-rounded(src=you.twitter.profile_image_url)
-        video#localVideo.topleft(width="100%", height="100%", autoplay="autoplay")
+        video#localVideo.topleft(width="100%", autoplay="autoplay")
       #buddylist.boxed.row-fluid
         p='WebRTC With Me Link'
         if thisIsHash
@@ -23,13 +23,13 @@ block main
             include list
     .span8.padding
       .row
-        #statusarea.boxed(hidden="hidden")
-          p="No active call"
-        #chatarea.boxed
+        #statusarea.boxed
+          h1="Waiting to WebRTCwith someone"
+        #chatarea.fadedout.boxed
           #remoteTwitter.overlay_item
-          video#remoteVideo(height="600px", autoplay="autoplay")
+          video#remoteVideo(width="100%", autoplay="autoplay")
       .row
-        #controlsarea.boxed.container
+        #controlsarea.boxed.container.span12
           .row-fluid
             textarea.span11#chatlog(readonly, rows="5")
           .row-fluid

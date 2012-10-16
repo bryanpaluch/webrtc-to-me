@@ -3,10 +3,9 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.face
   include ../includes/head
   body
       include ../includes/header
-      .container-fluid
-        .main-content
-            block main
-          block content
+      .container.main-content.wrapper
+          block main
+        block content
     include ../includes/footer
     include ../includes/foot
     block extrajs

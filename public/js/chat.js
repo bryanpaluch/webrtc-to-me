@@ -19,6 +19,7 @@ var mediaConstraints = {
 	'has_audio': true,
 	'has_video': true
 };
+var voiceOnly = false;
 function selectText() {
 	if (document.selection) {
 		var range = document.body.createTextRange();
@@ -73,7 +74,6 @@ $(document).ready(function() {
 	socket.on('rtc_request', function(req) {
 		currentTarget = req.target;
     console.log(req);
-		$(":button").attr('disabled', 'disabled');
 		if (isRTCPeerConnection)	
 			processSignalingMessage(req);
 		else
@@ -93,7 +93,8 @@ $(document).ready(function() {
 		if (action === 'startChat') {
 			currentTarget = target;
       currentTargetType = targetType;
-			$(":button").attr('disabled', 'disabled');
+			$(this).html("End Chat");
+      $(this).attr('action', 'endChat');
 			initiator = true;
 			maybeStart();
 		}
@@ -251,6 +252,7 @@ function sendMessage(message) {
 function processSignalingMessage(msg) {
 
 	if (msg.type === 'offer') {
+		$("[target=" +currentTarget+"]").html('End Chat').attr('action','endChat');
 		// Callee creates PeerConnection
 		if (!initiator && ! started)  
 			maybeStart();
@@ -310,6 +312,8 @@ function onUserMediaSuccess(stream) {
 	localVideo.src = url;
 	localStream = stream;
 	$('#localTwitter').removeAttr('hidden');
+   $("#selfView").show();
+   $("#selfView").animate({opacity:1},600);
 	userMediaReady = true;
 	webRtcReady();
 }
@@ -391,6 +395,12 @@ function waitForRemoteVideo() {
 	}
 }
 function transitionToActive() {
+  if(voiceOnly){
+   $("#statusarea").animate({opacity:0},600, function(){
+     $("#statusarea").val("<h1>Voice Only Call</h1>");
+     $("#statusarea").animate({opacity:1},300);
+   });
+  }else{
 	$('#remoteTwitter').html('<img src="' + usersList[currentTarget].pic + '"/>');
 	remoteVideo.style.opacity = 1;
   $("#statusarea").animate({opacity: 0},600, function(){
@@ -398,10 +408,16 @@ function transitionToActive() {
       $("#chatarea").show();
       $("#chatarea").animate({opacity:1}, 300);
   });
-
+  }
 }
 
 function transitionToWaiting() {
+  if(voiceOnly){
+   $("#statusarea").animate({opacity:0},600, function(){
+     $("#statusarea").val("<h1>Waiting to WebRTCwith someone</h1>");
+     $("#statusarea").animate({opacity:1},300);
+    });
+  }else{
 	setTimeout(function() {
 		remoteVideo.src = ""
 	},
@@ -409,9 +425,10 @@ function transitionToWaiting() {
 	remoteVideo.style.opacity = 0;
   $("#chatarea").animate({opacity: 0},600, function(){
       $("#chatarea").hide();
-      $("statusarea").show();
+      $("#statusarea").show();
       $("#statusarea").animate({opacity:1}, 300);
   });
+  }
 }
 
 function transitionToDone() {
