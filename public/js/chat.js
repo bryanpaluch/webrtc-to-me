@@ -379,6 +379,11 @@ function onSessionOpened(message) {
   console.log(this);
   console.log(message);
 	console.log("Session opened.");
+  //Super bad hack for demoing voice call out to pstn...
+  if(voiceOnly){
+    console.log("voice only transfering to active");
+    transitionToActive();
+  }
 }
 function onRemoteStreamAdded(event) {
 	console.log("Remote stream added.");
@@ -411,7 +416,7 @@ function onRemoteHangup() {
 }
 
 function waitForRemoteVideo() {
-	if (remoteVideo.currentTime > 0) {
+	if (remoteVideo.currentTime > 0 || voiceOnly) {
 		transitionToActive();
 	} else {
 		setTimeout(waitForRemoteVideo, 100);
@@ -419,8 +424,9 @@ function waitForRemoteVideo() {
 }
 function transitionToActive() {
   if(voiceOnly){
+    console.log("changing voice status");
    $("#statusarea").animate({opacity:0},600, function(){
-     $("#statusarea").val("<h1>Voice Only Call</h1>");
+     $("#statusarea").html("<h1>Voice Only Call</h1>");
      $("#statusarea").animate({opacity:1},300);
    });
   }else{
@@ -437,7 +443,7 @@ function transitionToActive() {
 function transitionToWaiting() {
   if(voiceOnly){
    $("#statusarea").animate({opacity:0},600, function(){
-     $("#statusarea").val("<h1>Waiting to WebRTCwith someone...</h1>");
+     $("#statusarea").html("<h1>Waiting to WebRTCwith someone...</h1>");
      $("#statusarea").animate({opacity:1},300);
     });
     voiceOnly = false;
