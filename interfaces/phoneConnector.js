@@ -31,10 +31,18 @@ function PhoneConnector() {
         for(var i = 0; i < message.candidates.length; i++){
                 var candidate = message.candidates[i];
                 console.log(candidate);
-                candidate['target'] = targets[req.params.uuid]; 
+                var target = targets[req.params.uuid];
+                candidate['target'] = target;
+                candidate['from'] = sessions[target].from;
                 self.emit('event',candidate);
             } 
         }
+      else if(message.type == 'bye'){
+        var target = targets[req.params.uuid];
+        message['target'] = target;
+        message['from'] = sessions[target].from;
+        self.emit('event',message);
+      }
       else
         {
           console.log('no match for message type in phoneConnector');
@@ -61,23 +69,27 @@ PhoneConnector.prototype.send = function(data){
   	  	break;
   	  case 'answer':
      		doAnswer(data);
-  		break;
+  		  break;
       case 'icefinished':
-       data.type = 'candidate';
-       data['last'] = true;
-       doCandidate(data);
-       break;
+        data.type = 'candidate';
+        data['last'] = true;
+        doCandidate(data);
+        break;
+      case 'bye':
+        doBye(data);
+        break;
   	  default:
-  	  	console.log("Error no matching case for sendMessage data type - phone Connector");
+  	  	console.log("Error no matching case for sendMessage data type" + data.type + " - phone Connector");
 	   }
 }
 
 exports.PhoneConnector = PhoneConnector;
 
 function doOffer(data) {
-  var target = data.target;
+  var from = data.target;
   var offerData = data;
-  sessions[target] = {active : false, candidates: [], uuid : null};
+  var target = data.from;
+  sessions[target] = {active : false, candidates: [], uuid : null, from: from};
 	client.post('/session', {phoneNumber: '1002',
 		callbackUrl: 'http://127.0.0.1:3000/session/'
 	},
@@ -117,7 +129,7 @@ function doCandidates(candidates){
     doCandidate(candidates[x]);
 }
 function doCandidate(data) {
-  var target = data.target;
+  var target = data.from;
   console.log('phoneConnector: new candidate for session ' + target);
   if(sessions[target]){
     if(sessions[target].active == true){
@@ -137,6 +149,23 @@ function doCandidate(data) {
 
 function doAnswer(data) {
 
+}
+function doBye(data){
+  var target = data.from;
+  console.log('phoneConnector: request to end session ' + target);
+  if(sessions[target]){
+    if(sessions[target].active == true){
+      client.del('/session/' + sessions[target].uuid, function (err, req, res, data){
+        if(err)
+          return new Error(err);
+        else{
+          console.log('sent session delete');
+        }
+      });
+    }else{
+      console.log('session was never started dropping');
+    }
+  }
 }
 
 exports.createConnector = function(){

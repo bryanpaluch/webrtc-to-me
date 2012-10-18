@@ -116,12 +116,12 @@ module.exports = function(server, config, auth) {
 			console.log("user id of this message is " + this.handshake.sessionID);
 			console.log(data);
 			var target = data.target;
-			data.target = this.user.id;
+			data.from = this.user.id;
 			if (data.type == 'offer' || data.type == 'answer') {
 				socket.legs[target] = true;
 			}
       if(data.targetType == 'phone'){
-        console.log(pc);
+
         pc.send(data);
       }else{
 			io.sockets. in (target).emit('rtc_request', data);
@@ -132,9 +132,6 @@ module.exports = function(server, config, auth) {
       var target = data.target;
       io.sockets.in(target).emit('rtc_request', data);
       console.log('sent to client ' + target);
-      if(data.type == 'offer' || data.type == 'answer'){
-        socket.legs[target] = true;
-      }
   });
 }
 

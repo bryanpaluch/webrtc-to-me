@@ -72,7 +72,8 @@ $(document).ready(function() {
     }
 	});
 	socket.on('rtc_request', function(req) {
-		currentTarget = req.target;
+		currentTarget = req.from;
+    console.log('Current target is ' + currentTarget); 
     console.log(req);
 		if (isRTCPeerConnection)	
 			processSignalingMessage(req);
@@ -342,18 +343,18 @@ function onUserMediaError(error) {
 }
 function onNegotiationNeeded(event){
   console.log('negoiation needed');
-  console.log(event);
+ // console.log(event);
 }
 function onIceCandidate(event){
 	if (event.candidate) {
-    console.log(event);
+   // console.log(event);
 		sendMessage({type: 'candidate',
 								 label: event.candidate.sdpMLineIndex,
 								 id: event.candidate.sdpMid,
 								 candidate: event.candidate.candidate,
                  });
 	} else {
-    console.log(event);
+  //  console.log(event);
 		sendMessage({type: 'icefinished',
                 });
 		console.log("End of candidates");
@@ -407,6 +408,7 @@ function onHangup() {
 
 function onRemoteHangup() {
 	console.log('Session terminated.');
+  console.log(currentTarget);
 	onListChange(currentTarget,'open');	
 	started = false; // Stop processing any message
 	transitionToWaiting();
