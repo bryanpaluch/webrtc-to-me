@@ -26,6 +26,8 @@ module.exports = function (app, passport, auth) {
   app.put('/users/:userId', users.update);
   app.get('/auth/twitter', passport.authenticate('twitter', { failureRedirect: '/login' }), users.signin)
   app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), users.authCallback)
+  app.get('/auth/rtcgateway', passport.authorize('webrtcgw-authz', {session: false, failureRedirect: '/login'}), users.show);
+  app.get('/auth/rtcgateway/callback', passport.authorize('webrtcgw-authz', {session: false, failureRedirect: '/login'}), users.rtcauthCallback);
   app.param('userId', function (req, res, next, id) {
     User
       .findOne({ _id : id })

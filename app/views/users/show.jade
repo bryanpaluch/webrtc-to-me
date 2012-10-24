@@ -5,6 +5,8 @@ block main
     .row.span11.boxed
       h1=user.name
       - var action = '/users/'+user.id
+      a(href="/auth/rtcgateway")
+        p="Click here to add your WebRTC provider"
       form.row.form-horizontal(method="post", action=action)
         input(type="hidden", name="_method", value="PUT") 
         .control-group

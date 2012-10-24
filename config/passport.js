@@ -3,6 +3,7 @@ var mongoose = require('mongoose')
   , LocalStrategy = require('passport-local').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
   , User = mongoose.model('User')
+  , WebrtcGWStrategy = require('passport-oauth').OAuth2Strategy;
 
 
 exports.boot = function (passport, config) {
@@ -10,6 +11,7 @@ exports.boot = function (passport, config) {
 
   // serialize sessions
   passport.serializeUser(function(user, done) {
+    console.log('serializing user');
     done(null, user.id)
   })
 
@@ -65,5 +67,17 @@ exports.boot = function (passport, config) {
       })
     }
   ))
+  passport.use('webrtcgw-authz', new WebrtcGWStrategy({
+         tokenURL: 'http://10.255.132.197:3002/oauth/token'
+      ,  authorizationURL: 'http://10.255.132.197:3002/dialog/authorize'
+      ,  clientID: config.webrtcgw.consumerKey
+      , clientSecret: config.webrtcgw.consumerSecret
+      , callbackURL: config.webrtcgw.callbackURL
+    },
+    function(token, tokenSecret, profile, done) {
+      console.log(token, tokenSecret, profile);
+    }
+  ))
+
 
 }
