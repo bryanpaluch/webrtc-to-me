@@ -121,8 +121,26 @@ module.exports = function(server, config, auth) {
 				socket.legs[target] = true;
 			}
       if(data.targetType == 'phone'){
-
-        pc.send(data);
+        if(data.type == 'offer'){
+          //type is offer we need to look up the users phone number first use chatChannel minus
+          // the -owner part to get the owner of the channels id
+          // TODO this is a hack
+		      User.findOne({
+			      _id: socket.chatChannel.substring(0, 24)
+		      }).exec(function(err, user) {
+			      if (err) throw (err);
+            if (!user) throw ('Failed to load User ' + socket.chatChannel);
+            if(user.phoneInChat && user.phoneNumber){
+              data.toTN = user.phoneNumber;
+              data.fromTN = '1062';
+              pc.send(data);
+            }else{
+              console.log('log error user has no phone number on file');
+            }
+            });
+          }else{
+              pc.send(data);
+        }
       }else{
 			io.sockets. in (target).emit('rtc_request', data);
       }

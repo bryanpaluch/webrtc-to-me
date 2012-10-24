@@ -89,9 +89,13 @@ function doOffer(data) {
   var from = data.target;
   var offerData = data;
   var target = data.from;
+  var toTN = data.toTN;
+  var fromTN = data.fromTN;
   sessions[target] = {active : false, candidates: [], uuid : null, from: from};
 	client.post('/session', {phoneNumber: '1002',
-		callbackUrl: 'http://127.0.0.1:3000/session/'
+		callbackUrl: 'http://127.0.0.1:3000/session/',
+    to: toTN,
+    from: fromTN
 	},
 	function(err, req, res, data) {
 		if (err) 
