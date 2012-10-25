@@ -6,13 +6,16 @@ block main
       h1=user.name
       - var action = '/users/'+user.id
       a(href="/auth/rtcgateway")
-        p="Click here to add your WebRTC provider"
+        if(updated)
+          p=updated
+        else
+          p="Click here to add or update your WebRTC provider"
       form.row.form-horizontal(method="post", action=action)
         input(type="hidden", name="_method", value="PUT") 
         .control-group
           label.control-label(for='phoneNumber') Phone Number
           .controls.controls-row
-            input#title.input-xlarge(type='text', name="phoneNumber", value=user.phoneNumber, placeholder=user.phoneNumber)
+            #title.span.input-xlarge.uneditable-input=user.phoneNumber
             &nbsp; 
             if(user.phoneInChat)
               input(type='checkbox', name="phoneInChat", value=user.phoneInChat, checked="checked")

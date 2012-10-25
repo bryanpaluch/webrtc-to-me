@@ -15,6 +15,33 @@ exports.authCallback = function(req, res, next) {
 		res.redirect('/');
 	}
 }
+exports.rtcauthCallback = function(req, res, next){
+  var user = req.user;
+  if(req.account){
+    user.webrtcProviderToken= req.account.token;
+    user.phoneNumber =  req.account.phoneNumber;
+		user.save(function(err, doc) {
+			if (err) {
+				res.render('users/show', {
+					title: 'Edit User',
+					user: user,
+					errors: err.errors,
+          updated: false
+				})
+			}
+			else {
+	      res.render('users/show', {
+		    title: user.name,
+		    user: user,
+        updated: 'WebRTC Provider Authorization Succesful!'
+	      });
+			}
+		});
+
+  }else{
+		res.redirect('/users/' + user._id)
+  }
+}
 
 // login
 exports.login = function(req, res) {
@@ -70,7 +97,8 @@ exports.update = function(req, res) {
 					res.render('users/show', {
 						title: 'Edit User',
 						user: doc,
-						errors: err.errors
+						errors: err.errors,
+            updated: false
 					});
 				}
 				else {
@@ -108,7 +136,8 @@ exports.show = function(req, res) {
 	var user = req.profile
 	res.render('users/show', {
 		title: user.name,
-		user: user
+		user: user,
+    updated: false
 	});
 }
 

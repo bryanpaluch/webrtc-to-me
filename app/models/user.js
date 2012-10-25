@@ -19,6 +19,7 @@ var UserSchema = new Schema({
   , github: {}
 	, phoneNumber: ''
 	, familyName: ''
+  , webrtcProviderToken: {}
   , phoneInChat: false
   , chatUrl: ''
 })

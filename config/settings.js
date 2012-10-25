@@ -19,7 +19,6 @@ function bootApplication(app, config, passport) {
 				baseUrl: __dirname,
 				nodeRequire: require
 				})
-  console.log(config.shortUrl);	
   global.shortUrl = config.shortUrl;
   app.set('showStackError', true)
   app.use(express.static(__dirname + '/../public'))
@@ -42,13 +41,13 @@ function bootApplication(app, config, passport) {
       next()
     })
 
-    // cookieParser should be above session
-    app.use(express.cookieParser())
 
     // bodyParser should be above methodOverride
     app.use(express.bodyParser())
     app.use(express.methodOverride())
 
+    // cookieParser should be above session
+    app.use(express.cookieParser())
     app.use(express.session({
       secret: 'conference',
       store: new mongoStore({
