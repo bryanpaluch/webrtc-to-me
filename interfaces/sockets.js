@@ -132,7 +132,7 @@ module.exports = function(server, config, auth) {
             if (!user) throw ('Failed to load User ' + socket.chatChannel);
             if(user.phoneInChat && user.phoneNumber){
               data.toTN = user.phoneNumber;
-              data.fromTN = '1062';
+              data.fromTN = '8605818926';
               pc.send(data);
             }else{
               console.log('log error user has no phone number on file');

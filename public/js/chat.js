@@ -225,7 +225,7 @@ function maybeStart() {
 	}
 }
 function doCall() {
-	console.log("Send offer to peer");
+	console.log("Sending offer to peer");
 	if (isRTCPeerConnection) {
 		pc.createOffer(setLocalAndSendMessage, null, mediaConstraints);
 	} else {
@@ -240,7 +240,7 @@ function doCall() {
 }
 
 function doAnswer() {
-	console.log("Send answer to peer");
+	console.log("Sending answer to peer");
 	if (isRTCPeerConnection) {
 		pc.createAnswer(setLocalAndSendMessage, null, mediaConstraints);
 	} else {
@@ -281,8 +281,9 @@ function processSignalingMessage(msg) {
     if(msg.voiceOnly)
       voiceOnly = true;
     console.log(voiceOnly);
-    console.log('got ansewr');
+    console.log('got answer');
 		pc.setRemoteDescription(new RTCSessionDescription(msg));
+    console.log(pc);
 	} else if (msg.type === 'candidate' && started) {
 		var candidate = new RTCIceCandidate({
 			sdpMLineIndex: msg.label,
