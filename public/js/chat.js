@@ -230,6 +230,7 @@ function doCall() {
 		pc.createOffer(setLocalAndSendMessage, null, mediaConstraints);
 	} else {
 		var offer = pc.createOffer(mediaConstraints);
+    offer = stripVideo(offer);
 		pc.setLocalDescription(pc.SDP_OFFER, offer);
 		sendMessage({
 			type: 'offer',
@@ -255,10 +256,39 @@ function doAnswer() {
 }
 
 function setLocalAndSendMessage(sessionDescription) {
-	pc.setLocalDescription(sessionDescription);
-	sendMessage(sessionDescription);
-}
+  console.log(sessionDescription);
 
+  stripVideo(sessionDescription, function(sdp){
+  pc.setLocalDescription(sessionDescription);
+  console.log('local SDP');
+  console.log(sessionDescription);
+	sendMessage(sessionDescription);
+  });
+}
+function stripVideo(sdp, cb){
+  // quick and dirty sip parsing
+ var sdpLines = sdp.sdp.split('\r\n');
+ console.log(sdpLines);
+ var m = 0;
+ sdp.sdp = '';
+ for(var a = 0; a < sdpLines.length; a++){
+ var lineType = sdpLines[a].split('=')[0];
+   console.log(lineType);
+   if(lineType == 'm'){
+     m++;
+     console.log(m + 'hit m');
+     if(m > 1){
+       console.log('bouncing out of sdp loop');
+       console.log(sdp);
+       console.log(sdpLines[a]);
+       cb(sdp);
+       return;
+     }
+   }
+   console.log(sdpLines[a]);
+   sdp.sdp += sdpLines[a] + '\r\n';
+  }
+}
 function sendMessage(message) {
 	message.target = currentTarget;
   message.targetType = currentTargetType;
@@ -272,6 +302,7 @@ function processSignalingMessage(msg) {
 		// Callee creates PeerConnection
 		if (!initiator && ! started)  
 			maybeStart();
+
 		// We only know JSEP version after createPeerConnection()
 		if (isRTCPeerConnection) pc.setRemoteDescription(new RTCSessionDescription(msg));
 		else pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(msg.sdp));
@@ -281,7 +312,8 @@ function processSignalingMessage(msg) {
     if(msg.voiceOnly)
       voiceOnly = true;
     console.log(voiceOnly);
-    console.log('got answer');
+    console.log('got answer SDP');
+    console.log(msg);
 		pc.setRemoteDescription(new RTCSessionDescription(msg));
     console.log(pc);
 	} else if (msg.type === 'candidate' && started) {
@@ -419,6 +451,7 @@ function onRemoteHangup() {
 }
 
 function waitForRemoteVideo() {
+  console.log('waiting for remote videoing...');
 	if (remoteVideo.currentTime > 0 || voiceOnly) {
 		transitionToActive();
 	} else {
