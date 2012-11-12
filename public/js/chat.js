@@ -188,6 +188,9 @@ function createPeerConnection() {
 		pc.onicecandidate = onIceCandidate;
 		console.log("Created webkitRTCPeerConnection with config \"" + JSON.stringify(pc_config) + "\".");
     if(currentTargetType === 'phone'){
+     //media Constraints doesn't work so we need to manipulate the local SDP ourselves. 
+      voiceOnly= true;
+
       var mediaConstraints = {
 	    'has_audio': true,
 	    'has_video': false 
@@ -257,13 +260,19 @@ function doAnswer() {
 
 function setLocalAndSendMessage(sessionDescription) {
   console.log(sessionDescription);
-
+  if(voiceOnly){
   stripVideo(sessionDescription, function(sdp){
   pc.setLocalDescription(sessionDescription);
   console.log('local SDP');
   console.log(sessionDescription);
 	sendMessage(sessionDescription);
   });
+  }else{
+  pc.setLocalDescription(sessionDescription);
+  console.log('local SDP');
+  console.log(sessionDescription);
+	sendMessage(sessionDescription);
+  }
 }
 function stripVideo(sdp, cb){
   // quick and dirty sip parsing
@@ -289,6 +298,7 @@ function stripVideo(sdp, cb){
    sdp.sdp += sdpLines[a] + '\r\n';
   }
 }
+
 function sendMessage(message) {
 	message.target = currentTarget;
   message.targetType = currentTargetType;
@@ -421,6 +431,7 @@ function onSessionOpened(message) {
 }
 function onRemoteStreamAdded(event) {
 	console.log("Remote stream added.");
+  console.log(event);
 	var url = webkitURL.createObjectURL(event.stream);
 	remoteVideo.src = url;
 	waitForRemoteVideo();

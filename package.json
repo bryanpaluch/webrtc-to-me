@@ -34,7 +34,7 @@
     "socket.io" : "latest",
     "short" : "latest",
     "ua-parser" : "latest",
-    "restify" : "latest"
+    "request" : "latest"
   },
   "main": "server.js",
   "directories": {

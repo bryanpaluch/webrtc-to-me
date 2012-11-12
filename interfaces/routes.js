@@ -64,7 +64,7 @@ module.exports = function (app, passport, auth) {
 	function checkBrowser(req, res, next){
 			var ua = uaParser.parse(req.headers['user-agent']);
 			console.log(ua);
-			if(ua.family == 'Chrome' && ua.patch >= 1284 && ua.major >= 24)
+			if(ua.family == 'Chrome' && ua.patch >= 1271 && ua.major >= 23)
       {
 			next();
 			}else{
