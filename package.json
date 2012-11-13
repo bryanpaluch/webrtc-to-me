@@ -29,12 +29,14 @@
     "nodemon": "latest",
     "requirejs": "latest",
     "jade-browser": "latest",
-    "redis" : "latest",
-    "cookie" : "latest",
-    "socket.io" : "latest",
-    "short" : "1.6.0",
-    "ua-parser" : "latest",
-    "request" : "latest"
+    "redis": "latest",
+    "cookie": "latest",
+    "socket.io": "latest",
+    "short": "1.7.0",
+    "ua-parser": "latest",
+    "request": "latest",
+    "passport-oauth": "latest",
+    "hiredis": "~0.1.14"
   },
   "main": "server.js",
   "directories": {
