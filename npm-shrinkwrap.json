@@ -407,6 +407,9 @@
     },
     "hiredis": {
       "version": "0.1.14"
+    },
+    "oauth": {
+      "version": "0.9.8"
     }
   }
 }
