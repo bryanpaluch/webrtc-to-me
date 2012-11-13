@@ -32,7 +32,7 @@
     "redis" : "latest",
     "cookie" : "latest",
     "socket.io" : "latest",
-    "short" : "latest",
+    "short" : "1.6.0",
     "ua-parser" : "latest",
     "request" : "latest"
   },
