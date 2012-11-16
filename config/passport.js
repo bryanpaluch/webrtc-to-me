@@ -92,7 +92,7 @@ exports.boot = function (passport, config) {
 
     try {
       var json = JSON.parse(body);
-
+      console.log(json);
       var profile = {provider: 'webrtcgw'};
       profile.id = json.user_id;
       profile.name = json.name;

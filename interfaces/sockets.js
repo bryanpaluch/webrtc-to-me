@@ -131,6 +131,7 @@ module.exports = function(server, config, auth) {
 			      if (err) throw (err);
             if (!user) throw ('Failed to load User ' + socket.chatChannel);
             if(user.phoneInChat && user.phoneNumber){
+              data.token = user.webrtcProviderToken;
               data.toTN = user.phoneNumber;
               data.fromTN = '8605818926';
               pc.send(data);

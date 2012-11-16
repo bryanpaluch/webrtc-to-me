@@ -30,11 +30,11 @@ require('./config/passport').boot(passport, config)
 require('./config/settings').boot(app, config, passport)
 
 // Bootstrap interfaces
-require('./interfaces/phoneConnector').EndPoint(app, {jsep2sipgw: config.jsep2sipgw});
+require('./interfaces/phoneConnector').EndPoint(app, config);
 require('./interfaces/routes')(app, passport, auth);
 require('./interfaces/sockets')(server, config, auth);
 
 // Start the app by listening on <port>
-var port = process.env.PORT || 3000
+var port = config.port
 server.listen(port)
 console.log('Express app started on port '+port)
