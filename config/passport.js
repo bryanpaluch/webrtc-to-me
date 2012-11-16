@@ -68,9 +68,9 @@ exports.boot = function (passport, config) {
     }
   ))
   var webrtcStrategy = new OAuthStrategy({
-         requestTokenURL: 'http://oauth.comcastlabs.com:3002/oauth/request_token'
-      ,  accessTokenURL: 'http://oauth.comcastlabs.com:3002/oauth/access_token'
-      ,  userAuthorizationURL: 'http://oauth.comcastlabs.com:3002/dialog/authorize'
+         requestTokenURL: config.webrtcgw.oauthServer + '/oauth/request_token'
+      ,  accessTokenURL: config.webrtcgw.oauthServer + '/oauth/access_token'
+      ,  userAuthorizationURL: config.webrtcgw.oauthServer + '/dialog/authorize'
       ,  consumerKey: config.webrtcgw.consumerKey
       ,  consumerSecret: config.webrtcgw.consumerSecret
       ,  callbackURL: config.webrtcgw.callbackURL
@@ -87,7 +87,7 @@ exports.boot = function (passport, config) {
   webrtcStrategy.userProfile = function(token, tokenSecret, params, done) {
   console.log('loading webrtc profile ');
   console.log(params);
-  this._oauth.get('http://oauth.comcastlabs.com:3002/api/userinfo', token, tokenSecret, function(err, body, res){
+  this._oauth.get(config.webrtcgw.oauthServer + '/api/userinfo', token, tokenSecret, function(err, body, res){
     if (err) { return done(new InternalOAuthError('failed to fetch user profile', err));}
 
     try {
