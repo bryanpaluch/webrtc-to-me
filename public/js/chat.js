@@ -19,6 +19,10 @@ var mediaConstraints = {
 	'has_audio': true,
 	'has_video': true
 };
+var sdpConstraints = {'mandatory' :{
+  'OfferToReceiveAudio': true,
+  'OfferToReceiveVideo': true
+}};
 var voiceOnly = false;
 function selectText() {
 	if (document.selection) {
@@ -75,10 +79,7 @@ $(document).ready(function() {
 		currentTarget = req.from;
     console.log('Current target is ' + currentTarget); 
     console.log(req);
-		if (isRTCPeerConnection)	
-			processSignalingMessage(req);
-		else
-			processSignalingMessage00(req);
+		processSignalingMessage(req);
 
 	});
 	socket.on('rtc_reload', function(data) {
@@ -175,7 +176,7 @@ function init() {
 	status = $('#status');
 	localVideo = $('#localVideo')[0];
 	remoteVideo = $('#remoteVideo')[0];
-	getUserMedia();
+	doGetUserMedia();
 }
 function createPeerConnection() {
 	var pc_config = {
@@ -183,8 +184,10 @@ function createPeerConnection() {
 			"url": "stun:stun.l.google.com:19302"
 		}]
 	};
+  var pc_constraints = {"optional": [{"DtlsSrtpKeyAgreement" : true}]};
+
 	try {
-		pc = new webkitRTCPeerConnection(pc_config);
+		pc = new RTCPeerConnection(pc_config, pc_constraints);
 		pc.onicecandidate = onIceCandidate;
 		console.log("Created webkitRTCPeerConnection with config \"" + JSON.stringify(pc_config) + "\".");
     if(currentTargetType === 'phone'){
@@ -229,33 +232,20 @@ function maybeStart() {
 }
 function doCall() {
 	console.log("Sending offer to peer");
-	if (isRTCPeerConnection) {
-		pc.createOffer(setLocalAndSendMessage, null, mediaConstraints);
-	} else {
-		var offer = pc.createOffer(mediaConstraints);
-    offer = stripVideo(offer);
-		pc.setLocalDescription(pc.SDP_OFFER, offer);
-		sendMessage({
-			type: 'offer',
-			sdp: offer.toSdp()
-		});
-		pc.startIce();
-	}
+  var constraints = {"optional": [], "mandatory": {"MozDontOfferDataChannel" :true}};
+  if (webrtcDetectedBrowser === "chrome"){
+    for (prop in constraints.mandatory) {
+      if( prop.indexOf("Moz") != -1){
+        delete constraints.mandatory[prop];
+      }
+    }
+  }
+	pc.createOffer(setLocalAndSendMessage, null, constraints);
 }
 
 function doAnswer() {
 	console.log("Sending answer to peer");
-	if (isRTCPeerConnection) {
-		pc.createAnswer(setLocalAndSendMessage, null, mediaConstraints);
-	} else {
-		var offer = pc.remoteDescription;
-		var answer = pc.createAnswer(offer.toSdp(), mediaConstraints);
-		sendMessage({
-			type: 'answer',
-			sdp: answer.toSdp()
-		});
-		pc.startIce();
-	}
+	pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
 }
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -313,10 +303,7 @@ function processSignalingMessage(msg) {
 		if (!initiator && ! started)  
 			maybeStart();
 
-		// We only know JSEP version after createPeerConnection()
-		if (isRTCPeerConnection) pc.setRemoteDescription(new RTCSessionDescription(msg));
-		else pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(msg.sdp));
-
+		pc.setRemoteDescription(new RTCSessionDescription(msg));
 		doAnswer();
 	} else if (msg.type === 'answer' && started) {
     if(msg.voiceOnly)
@@ -338,40 +325,25 @@ function processSignalingMessage(msg) {
 	}
 }
 
-function processSignalingMessage00(msg) {
-  console.log(msg);
-	if (msg.type === 'answer' && started) {
-		pc.setRemoteDescription(pc.SDP_ANSWER, new SessionDescription(msg.sdp));
-	} else if (msg.type === 'candidate' && started) {
-		var candidate = new IceCandidate(msg.label, msg.candidate);
-		pc.processIceMessage(candidate);
-	} else if (msg.type === 'bye' && started) {
-		onRemoteHangup();
-	}
-}
 
-function getUserMedia() {
+function doGetUserMedia() {
+  var constraints = {"mandatory": {}, "optional":[]};
 	try {
-		navigator.webkitGetUserMedia({
+		getUserMedia({
 			audio: true,
-			video: true
-		},
-		onUserMediaSuccess, onUserMediaError);
+			video: constraints
+		}, onUserMediaSuccess, onUserMediaError);
 		console.log("Requested access to local media with new syntax.");
 	} catch(e) {
-		try {
-			navigator.webkitGetUserMedia("video,audio", onUserMediaSuccess, onUserMediaError);
-			console.log("Requested access to local media with old syntax.");
-		} catch(e) {
-			alert("webkitGetUserMedia() failed. Is the MediaStream flag enabled in about:flags?");
-			console.log("webkitGetUserMedia failed with exception: " + e.message);
-		}
+		alert("webkitGetUserMedia() failed. Is the MediaStream flag enabled in about:flags?");
+		console.log("webkitGetUserMedia failed with exception: " + e.message);
 	}
 }
 function onUserMediaSuccess(stream) {
 	console.log("User has granted access to local media.");
 	var url = webkitURL.createObjectURL(stream);
 	localVideo.style.opacity = 1;
+  localVideo.mute = true;
 	localVideo.src = url;
 	localStream = stream;
 	$('#localTwitter').removeAttr('hidden');
